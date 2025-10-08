@@ -46,7 +46,7 @@ gz sim sonoma.sdf
 > pkill -f gz
 > ```
 > ```bash 
-> pkil -f "gz sim"
+> pkill -f "gz sim"
 > ```
 
 ## Glossary
