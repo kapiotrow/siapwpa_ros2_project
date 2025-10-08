@@ -50,7 +50,7 @@ Należy pamiętać, aby po zbudowaniu wywołać komendę lub pracować w nowym t
 
 
 ## Dodatkowe materiały
-* [Getting Started](getting_started.md)
-* [ROS 2 Command Cheat Sheet](cheatsheet.md)
-* [ROS 2 Example packages in Python](example.md)
-* [Bridge communication between ROS and Gazebo](ros_gz_bridge.md)
+* [Getting Started](docs/getting_started.md)
+* [ROS 2 Command Cheat Sheet](docs/cheatsheet.md)
+* [ROS 2 Example packages in Python](docs/example.md)
+* [Bridge communication between ROS and Gazebo](docs/ros_gz_bridge.md)
