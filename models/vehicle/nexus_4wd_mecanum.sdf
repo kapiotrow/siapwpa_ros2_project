@@ -1,4 +1,5 @@
-<sdf version='1.11'>
+<?xml version="1.0" ?>
+<sdf version='1.8' xmlns:gz="https://gazebosim.org/schema/gz">
   <model name='nexus_4wd_mecanum'>
     <link name='base_footprint'>
       <inertial>
@@ -18,7 +19,7 @@
         <geometry>
           <mesh>
             <scale>0.001 0.001 0.001</scale>
-            <uri>model://nexus_4wd_mecanum_description/meshes/nexus_base_link_collision.STL</uri>
+            <uri>model://meshes/nexus_4wd_mecanum/meshes/nexus_base_link_collision.STL</uri>
           </mesh>
         </geometry>
         <surface>
@@ -35,7 +36,7 @@
         <geometry>
           <mesh>
             <scale>0.001 0.001 0.001</scale>
-            <uri>model://nexus_4wd_mecanum_description/meshes/wheel_shaft.STL</uri>
+            <uri>model://meshes/nexus_4wd_mecanum/meshes/wheel_shaft.STL</uri>
           </mesh>
         </geometry>
         <surface>
@@ -52,7 +53,7 @@
         <geometry>
           <mesh>
             <scale>0.001 0.001 0.001</scale>
-            <uri>model://nexus_4wd_mecanum_description/meshes/wheel_shaft.STL</uri>
+            <uri>model://meshes/nexus_4wd_mecanum/meshes/wheel_shaft.STL</uri>
           </mesh>
         </geometry>
         <surface>
@@ -69,7 +70,7 @@
         <geometry>
           <mesh>
             <scale>0.001 0.001 0.001</scale>
-            <uri>model://nexus_4wd_mecanum_description/meshes/wheel_shaft.STL</uri>
+            <uri>model://meshes/nexus_4wd_mecanum/meshes/wheel_shaft.STL</uri>
           </mesh>
         </geometry>
         <surface>
@@ -86,7 +87,7 @@
         <geometry>
           <mesh>
             <scale>0.001 0.001 0.001</scale>
-            <uri>model://nexus_4wd_mecanum_description/meshes/wheel_shaft.STL</uri>
+            <uri>model://meshes/nexus_4wd_mecanum/meshes/wheel_shaft.STL</uri>
           </mesh>
         </geometry>
         <surface>
@@ -103,7 +104,7 @@
         <geometry>
           <mesh>
             <scale>0.001 0.001 0.001</scale>
-            <uri>model://nexus_4wd_mecanum_description/meshes/nexus_base_link.STL</uri>
+            <uri>model://meshes/nexus_4wd_mecanum/meshes/nexus_base_link.STL</uri>
           </mesh>
         </geometry>
         <material>
@@ -120,7 +121,7 @@
         <geometry>
           <mesh>
             <scale>0.001 0.001 0.001</scale>
-            <uri>model://nexus_4wd_mecanum_description/meshes/urm04.STL</uri>
+            <uri>model://meshes/nexus_4wd_mecanum/meshes/urm04.STL</uri>
           </mesh>
         </geometry>
         <material>
@@ -137,7 +138,7 @@
         <geometry>
           <mesh>
             <scale>0.001 0.001 0.001</scale>
-            <uri>model://nexus_4wd_mecanum_description/meshes/urm04.STL</uri>
+            <uri>model://meshes/nexus_4wd_mecanum/meshes/urm04.STL</uri>
           </mesh>
         </geometry>
         <material>
@@ -154,7 +155,7 @@
         <geometry>
           <mesh>
             <scale>0.001 0.001 0.001</scale>
-            <uri>model://nexus_4wd_mecanum_description/meshes/wheel_shaft.STL</uri>
+            <uri>model://meshes/nexus_4wd_mecanum/meshes/wheel_shaft.STL</uri>
           </mesh>
         </geometry>
         <material>
@@ -171,7 +172,7 @@
         <geometry>
           <mesh>
             <scale>0.001 0.001 0.001</scale>
-            <uri>model://nexus_4wd_mecanum_description/meshes/wheel_shaft.STL</uri>
+            <uri>model://meshes/nexus_4wd_mecanum/meshes/wheel_shaft.STL</uri>
           </mesh>
         </geometry>
         <material>
@@ -188,7 +189,7 @@
         <geometry>
           <mesh>
             <scale>0.001 0.001 0.001</scale>
-            <uri>model://nexus_4wd_mecanum_description/meshes/urm04.STL</uri>
+            <uri>model://meshes/nexus_4wd_mecanum/meshes/urm04.STL</uri>
           </mesh>
         </geometry>
         <material>
@@ -205,7 +206,7 @@
         <geometry>
           <mesh>
             <scale>0.001 0.001 0.001</scale>
-            <uri>model://nexus_4wd_mecanum_description/meshes/urm04.STL</uri>
+            <uri>model://meshes/nexus_4wd_mecanum/meshes/urm04.STL</uri>
           </mesh>
         </geometry>
         <material>
@@ -222,7 +223,7 @@
         <geometry>
           <mesh>
             <scale>0.001 0.001 0.001</scale>
-            <uri>model://nexus_4wd_mecanum_description/meshes/wheel_shaft.STL</uri>
+            <uri>model://meshes/nexus_4wd_mecanum/meshes/wheel_shaft.STL</uri>
           </mesh>
         </geometry>
         <material>
@@ -239,7 +240,7 @@
         <geometry>
           <mesh>
             <scale>0.001 0.001 0.001</scale>
-            <uri>model://nexus_4wd_mecanum_description/meshes/wheel_shaft.STL</uri>
+            <uri>model://meshes/nexus_4wd_mecanum/meshes/wheel_shaft.STL</uri>
           </mesh>
         </geometry>
         <material>
@@ -277,11 +278,11 @@
             <resolution>0.01</resolution>
           </range>
         </ray>
-        <plugin name='gazebo_ros_front_sensor' filename='libhector_gazebo_ros_sonar.so'>
+        <!-- <plugin name='gazebo_ros_front_sensor' filename='libhector_gazebo_ros_sonar.so'>
           <gaussianNoise>0.005</gaussianNoise>
           <topicName>front_sensor</topicName>
           <frameId>front_sensor</frameId>
-        </plugin>
+        </plugin> -->
         <pose>0.20499999999999999 0 0.059999999999999998 0 0 0</pose>
       </sensor>
       <sensor name='left_sensor' type='ray'>
@@ -309,11 +310,11 @@
             <resolution>0.01</resolution>
           </range>
         </ray>
-        <plugin name='gazebo_ros_left_sensor' filename='libhector_gazebo_ros_sonar.so'>
+        <!-- <plugin name='gazebo_ros_left_sensor' filename='libhector_gazebo_ros_sonar.so'>
           <gaussianNoise>0.005</gaussianNoise>
           <topicName>left_sensor</topicName>
           <frameId>left_sensor</frameId>
-        </plugin>
+        </plugin> -->
         <pose>0 0.108 0.059999999999999998 0 0 1.5708</pose>
       </sensor>
       <sensor name='rear_sensor' type='ray'>
@@ -341,11 +342,11 @@
             <resolution>0.01</resolution>
           </range>
         </ray>
-        <plugin name='gazebo_ros_rear_sensor' filename='libhector_gazebo_ros_sonar.so'>
+        <!-- <plugin name='gazebo_ros_rear_sensor' filename='libhector_gazebo_ros_sonar.so'>
           <gaussianNoise>0.005</gaussianNoise>
           <topicName>rear_sensor</topicName>
           <frameId>rear_sensor</frameId>
-        </plugin>
+        </plugin> -->
         <pose>-0.20100000000000001 0 0.059999999999999998 0 0 -3.1415899999999999</pose>
       </sensor>
       <sensor name='right_sensor' type='ray'>
@@ -373,11 +374,11 @@
             <resolution>0.01</resolution>
           </range>
         </ray>
-        <plugin name='gazebo_ros_right_sensor' filename='libhector_gazebo_ros_sonar.so'>
+        <!-- <plugin name='gazebo_ros_right_sensor' filename='libhector_gazebo_ros_sonar.so'>
           <gaussianNoise>0.005</gaussianNoise>
           <topicName>right_sensor</topicName>
           <frameId>right_sensor</frameId>
-        </plugin>
+        </plugin> -->
         <pose>0 -0.108 0.059999999999999998 0 0 -1.5708</pose>
       </sensor>
     </link>
@@ -420,23 +421,23 @@
           </cylinder>
         </geometry>
         <surface>
-          <contact>
-            <ode/>
-          </contact>
-          <friction>
-            <ode>
-              <mu>0</mu>
-              <mu2>0</mu2>
-            </ode>
-          </friction>
-        </surface>
+            <friction>
+              <ode>
+                <mu>1</mu>
+                <mu2>0</mu2>
+                <fdir1 gz:expressed_in='chassis'>1 -1 0</fdir1>
+              </ode>
+            </friction>
+            <bounce/>
+            <contact/>
+          </surface>
       </collision>
       <visual name='lower_left_wheel_visual'>
         <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
             <scale>0.001 0.001 0.001</scale>
-            <uri>model://nexus_4wd_mecanum_description/meshes/mecanum_wheel_right.STL</uri>
+            <uri>model://meshes/nexus_4wd_mecanum/meshes/mecanum_wheel_right.STL</uri>
           </mesh>
         </geometry>
         <material>
@@ -488,23 +489,23 @@
           </cylinder>
         </geometry>
         <surface>
-          <contact>
-            <ode/>
-          </contact>
-          <friction>
-            <ode>
-              <mu>0</mu>
-              <mu2>0</mu2>
-            </ode>
-          </friction>
-        </surface>
+            <friction>
+              <ode>
+                <mu>1</mu>
+                <mu2>0</mu2>
+                <fdir1 gz:expressed_in='chassis'>1 -1 0</fdir1>
+              </ode>
+            </friction>
+            <bounce/>
+            <contact/>
+          </surface>
       </collision>
       <visual name='lower_right_wheel_visual'>
         <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
             <scale>0.001 0.001 0.001</scale>
-            <uri>model://nexus_4wd_mecanum_description/meshes/mecanum_wheel_left.STL</uri>
+            <uri>model://meshes/nexus_4wd_mecanum/meshes/mecanum_wheel_left.STL</uri>
           </mesh>
         </geometry>
         <material>
@@ -556,23 +557,23 @@
           </cylinder>
         </geometry>
         <surface>
-          <contact>
-            <ode/>
-          </contact>
-          <friction>
-            <ode>
-              <mu>0</mu>
-              <mu2>0</mu2>
-            </ode>
-          </friction>
-        </surface>
+            <friction>
+              <ode>
+                <mu>1</mu>
+                <mu2>0</mu2>
+                <fdir1 gz:expressed_in='chassis'>1 -1 0</fdir1>
+              </ode>
+            </friction>
+            <bounce/>
+            <contact/>
+          </surface>
       </collision>
       <visual name='upper_left_wheel_visual'>
         <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
             <scale>0.001 0.001 0.001</scale>
-            <uri>model://nexus_4wd_mecanum_description/meshes/mecanum_wheel_left.STL</uri>
+            <uri>model://meshes/nexus_4wd_mecanum/meshes/mecanum_wheel_left.STL</uri>
           </mesh>
         </geometry>
         <material>
@@ -624,23 +625,23 @@
           </cylinder>
         </geometry>
         <surface>
-          <contact>
-            <ode/>
-          </contact>
-          <friction>
-            <ode>
-              <mu>0</mu>
-              <mu2>0</mu2>
-            </ode>
-          </friction>
-        </surface>
+            <friction>
+              <ode>
+                <mu>1</mu>
+                <mu2>0</mu2>
+                <fdir1 gz:expressed_in='chassis'>1 -1 0</fdir1>
+              </ode>
+            </friction>
+            <bounce/>
+            <contact/>
+          </surface>
       </collision>
       <visual name='upper_right_wheel_visual'>
         <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
             <scale>0.001 0.001 0.001</scale>
-            <uri>model://nexus_4wd_mecanum_description/meshes/mecanum_wheel_right.STL</uri>
+            <uri>model://meshes/nexus_4wd_mecanum/meshes/mecanum_wheel_right.STL</uri>
           </mesh>
         </geometry>
         <material>
@@ -653,7 +654,20 @@
         </material>
       </visual>
     </link>
-    <plugin name='nexus_ros_force_based_move' filename='libnexus_ros_force_based_move.so'>
+    <!-- NEw PLUGIN-->
+    <plugin name='gz::sim::systems::MecanumDrive' filename='gz-sim-mecanum-drive-system'>
+        <front_left_joint>upper_left_wheel_joint</front_left_joint>
+        <front_right_joint>upper_right_wheel_joint</front_right_joint>
+        <back_left_joint>lower_left_wheel_joint</back_left_joint>
+        <back_right_joint>lower_right_wheel_joint</back_right_joint>
+        <wheel_separation>1.25</wheel_separation>
+        <wheelbase>1.511</wheelbase>
+        <wheel_radius>0.3</wheel_radius>
+        <min_acceleration>-5</min_acceleration>
+        <max_acceleration>5</max_acceleration>
+    </plugin>
+    <!-- NEw PLUGIN END-->
+    <!-- <plugin name='nexus_ros_force_based_move' filename='libnexus_ros_force_based_move.so'>
       <commandTopic>cmd_vel</commandTopic>
       <odometryTopic>odom</odometryTopic>
       <odometryFrame>odom</odometryFrame>
@@ -667,7 +681,7 @@
       <max_x_velocity>0.6</max_x_velocity>
       <max_y_velocity>0.6</max_y_velocity>
       <max_yaw_velocity>0.5</max_yaw_velocity>
-    </plugin>
+    </plugin> -->
     <frame name='front_sensor_joint' attached_to='base_link'>
       <pose>0.20499999999999999 0 0.01 0 0 0</pose>
     </frame>

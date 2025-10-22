@@ -91,13 +91,13 @@
  
     
   <include>
-    <uri>model://models/Trapezoid_model.sdf</uri>
+    <uri>model://models/worlds/Trapezoid_model.sdf</uri>
     <pose>0 0 0.01 0 0 0</pose>
     <name>racetrack</name>
   </include>
 
   <include>
-    <uri>model://nexus_4wd_mecanum.sdf</uri>
+    <uri>model://models/vehicle/nexus_4wd_mecanum.sdf</uri>
     <pose>0 0 0.01 0 0 0</pose>
     <name>samochod</name>
   </include>
