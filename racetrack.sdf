@@ -92,13 +92,13 @@
     
   <include>
     <uri>model://models/worlds/Trapezoid_model.sdf</uri>
-    <pose>0 0 0.01 0 0 0</pose>
+    <pose>-10 -10 0.01 0 0 0</pose>
     <name>racetrack</name>
   </include>
 
   <include>
     <uri>model://models/vehicle/nexus_4wd_mecanum.sdf</uri>
-    <pose>0 0 0.01 0 0 0</pose>
+    <pose>-8 4 0.01 0 0 1.57</pose>
     <name>samochod</name>
   </include>
 
