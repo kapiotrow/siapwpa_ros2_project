@@ -7,7 +7,7 @@
 <geometry>
 <mesh>
 <uri>model://meshes/Trapezoid/Trapezoid_collision.dae</uri>
-<scale> 5 5 5</scale>
+<scale> 6 6 6</scale>
 </mesh>
 </geometry>
 </collision>
@@ -16,7 +16,7 @@
 <geometry>
 <mesh>
 <uri>model://meshes/Trapezoid/Trapezoid.dae</uri>
-<scale> 5 5 5 </scale>
+<scale> 6 6 6 </scale>
 </mesh>
 </geometry>
 </visual>
