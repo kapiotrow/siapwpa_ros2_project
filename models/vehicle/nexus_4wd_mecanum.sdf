@@ -118,7 +118,7 @@
       </visual>
 
       <gravity>true</gravity>
-
+      
       <!-- Sensors -->
       <sensor name='front_sensor' type='ray'>
         <always_on>true</always_on>
@@ -203,6 +203,53 @@
         </ray>
         <pose>0 -0.54 0.29999999999999999 0 0 -1.5708</pose>
       </sensor>
+
+            <!-- RealSense-style RGB + Depth Camera -->
+      <sensor name='realsense_rgbd' type='camera'>
+        <always_on>true</always_on>
+        <update_rate>30</update_rate>
+        <visualize>true</visualize>
+        <pose>1.1 0 0.4 0 0 0</pose> 
+
+        <camera>
+          <horizontal_fov>1.047</horizontal_fov> 
+          <image>
+            <width>640</width>
+            <height>480</height>
+            <format>R8G8B8</format>
+          </image>
+          <clip>
+            <near>0.05</near>
+            <far>10.0</far>
+          </clip>
+        </camera>
+
+        
+      </sensor>
+
+      <!-- Depth kamera (opcjonalna) -->
+      <sensor name='realsense_depth' type='depth'>
+        <always_on>true</always_on>
+        <update_rate>30</update_rate>
+        <visualize>true</visualize>
+        <pose>1.1 0 0.4 0 0 0</pose>
+
+        <camera>
+          <horizontal_fov>1.047</horizontal_fov>
+          <image>
+            <width>640</width>
+            <height>480</height>
+            <format>L8</format>
+          </image>
+          <clip>
+            <near>0.05</near>
+            <far>10.0</far>
+          </clip>
+        </camera>
+        
+
+      </sensor>
+
 
       <sensor name='rear_sensor' type='ray'>
         <always_on>true</always_on>
@@ -498,6 +545,11 @@
       <min_acceleration>-5</min_acceleration>
       <max_acceleration>5</max_acceleration>
     </plugin>
+
+    <plugin name='gz::sim::systems::Sensors' filename='gz-sim-sensors-system'>
+      <render_engine>ogre2</render_engine>
+    </plugin>
+
 
     <!-- Frames (sensor & shafts) attached to base_link and base_footprint -->
     <frame name='front_sensor_joint' attached_to='base_link'>

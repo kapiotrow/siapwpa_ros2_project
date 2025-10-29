@@ -101,6 +101,6 @@
     <pose>-8 4 0.01 0 0 1.57</pose>
     <name>samochod</name>
   </include>
-
+  
   </world>
 </sdf>
