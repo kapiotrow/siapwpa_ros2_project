@@ -5,12 +5,15 @@
     <static>false</static>
 
     <link name="camera_link">
-      <!-- RGB + Depth simulated sensors -->
-      <sensor name="realsense_rgb_camera" type="camera">
+            <!-- RealSense-style RGB + Depth Camera -->
+      <sensor name='realsense_rgbd' type='camera'>
         <always_on>true</always_on>
         <update_rate>30</update_rate>
+        <visualize>true</visualize>
+        <pose>1.1 0 0.4 0 0 0</pose> 
+
         <camera>
-          <horizontal_fov>1.047</horizontal_fov>
+          <horizontal_fov>1.047</horizontal_fov> 
           <image>
             <width>640</width>
             <height>480</height>
@@ -21,16 +24,17 @@
             <far>10.0</far>
           </clip>
         </camera>
-        <plugin
-          name="gz::sim::systems::CameraSensor"
-          filename="gz-sim-camera-system">
-          <topic>/camera/color/image_raw</topic>
-        </plugin>
+
+        
       </sensor>
 
-      <sensor name="realsense_depth_camera" type="depth">
+      <!-- Depth kamera (opcjonalna) -->
+      <sensor name='realsense_depth' type='depth'>
         <always_on>true</always_on>
         <update_rate>30</update_rate>
+        <visualize>true</visualize>
+        <pose>1.1 0 0.4 0 0 0</pose>
+
         <camera>
           <horizontal_fov>1.047</horizontal_fov>
           <image>
@@ -43,11 +47,7 @@
             <far>10.0</far>
           </clip>
         </camera>
-        <plugin
-          name="gz::sim::systems::DepthCamera"
-          filename="gz-sim-depth-camera-system">
-          <topic>/camera/depth/image_raw</topic>
-        </plugin>
+
       </sensor>
     </link>
   </model>
