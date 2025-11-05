@@ -12,7 +12,6 @@ class LineFollower:
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         
         # Define yellow color range in HSV
-        # (tune these if lighting varies)
         lower_yellow = np.array([15, 80, 80])
         upper_yellow = np.array([45, 255, 255])
         
@@ -23,7 +22,7 @@ class LineFollower:
         contours, hierarchy = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
         
         if len(contours) > 0:
-            # Get the largest contour (most likely the line)
+            # Sort by area and take the largest contour (index 0)
             contours = sorted(contours, key=cv2.contourArea, reverse=True)
             c = contours[1]
             M = cv2.moments(c)
@@ -31,18 +30,36 @@ class LineFollower:
                 cx = int(M['m10'] / M['m00'])
                 cy = int(M['m01'] / M['m00'])
                 print(f"CX: {cx}  CY: {cy}")
+
+                # Get frame dimensions
+                height, width, _ = frame.shape
+                center_x = width // 2
+                arrow_start = (center_x, height - 50)
                 
-                # Simple steering logic
-                if cx >= 120:
-                    print("Turn Left")
-                elif 40 < cx < 120:
-                    print("On Track!")
+                # Determine steering direction
+                if cx <= center_x + 50:
+                    direction = "Turn Left"
+                    arrow_end = (center_x - 50, height - 100)
+                    color = (0, 0, 255)  # Red arrow for left
+                elif cx >= center_x - 50:
+                    direction = "Turn Right"
+                    arrow_end = (center_x + 50, height - 100)
+                    color = (255, 0, 0)  # Blue arrow for right
                 else:
-                    print("Turn Right")
+                    direction = "On Track!"
+                    arrow_end = (center_x, height - 120)
+                    color = (0, 255, 0)  # Green arrow for forward
                 
-                # Draw visual markers
+                print(direction)
+                
+                # Draw the contour and centroid
                 cv2.circle(frame, (cx, cy), 5, (255, 255, 255), -1)
                 cv2.drawContours(frame, [c], -1, (0, 255, 0), 1)
+                
+                # Draw the direction arrow
+                cv2.arrowedLine(frame, arrow_start, arrow_end, color, 4, tipLength=0.4)
+                cv2.putText(frame, direction, (30, 40), cv2.FONT_HERSHEY_SIMPLEX, 
+                            1, color, 2, cv2.LINE_AA)
         else:
             print("I don't see the yellow line")
         
