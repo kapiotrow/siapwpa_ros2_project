@@ -24,7 +24,8 @@ class LineFollower:
         
         if len(contours) > 0:
             # Get the largest contour (most likely the line)
-            c = max(contours, key=cv2.contourArea)
+            contours = sorted(contours, key=cv2.contourArea, reverse=True)
+            c = contours[1]
             M = cv2.moments(c)
             if M["m00"] != 0:
                 cx = int(M['m10'] / M['m00'])
