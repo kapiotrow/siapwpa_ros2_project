@@ -2,7 +2,7 @@ import rclpy
 from rclpy.node import Node
 import cv2
 from cv_bridge import CvBridge
-
+from line_follower import LineFollower
 from sensor_msgs.msg import Image 
 
 bridge = CvBridge()
@@ -22,6 +22,7 @@ class RGBCameraSubscriber(Node):
             self.listener_callback,
             10)
         self.subscription  # prevent unused variable warning
+        self.line_follower = LineFollower()
 
     def listener_callback(self, msg):
         try:
@@ -29,7 +30,7 @@ class RGBCameraSubscriber(Node):
         except Exception as e:
             print("Error converting ROS Image to OpenCV: %s", e)
 
-        cv2.imshow("RGB image from camera", cv_image)
+        self.line_follower.process_frame(cv_image)
         cv2.waitKey(1)  # Required to update the OpenCV window
 
 class DepthCameraSubscriber(Node):
