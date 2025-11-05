@@ -13,8 +13,8 @@ class LineFollower:
         
         # Define yellow color range in HSV
         # (tune these if lighting varies)
-        lower_yellow = np.array([20, 100, 100])
-        upper_yellow = np.array([40, 255, 255])
+        lower_yellow = np.array([15, 80, 80])
+        upper_yellow = np.array([45, 255, 255])
         
         # Create a mask selecting only yellow parts
         mask = cv2.inRange(hsv, lower_yellow, upper_yellow)
@@ -49,31 +49,14 @@ class LineFollower:
         cv2.imshow("Mask", mask)
         cv2.imshow("Frame", frame)
 
-
-@pytest.fixture
-def sample_video(tmp_path):
-    """Creates a short synthetic video with a black line moving across white background."""
-    video_path = "/home/developer/ros2_ws/src/camera_package/camera_package/test_video.avi"
-    frame_width, frame_height = 160, 120
-    out = cv2.VideoWriter(str(video_path),
-                          cv2.VideoWriter_fourcc(*"XVID"),
-                          10, (frame_width, frame_height))
-
-    # moving black line for testing
-    for x in range(20, 140, 10):
-        frame = np.ones((frame_height, frame_width, 3), dtype=np.uint8) * 255
-        cv2.line(frame, (x, 60), (x, 80), (0, 0, 0), 5)
-        out.write(frame)
-    out.release()
-    return str(video_path)
-
-def test_line_follower_manual_display(sample_video):
+def test_line_follower_manual_display():
     """
     Manual visual test — opens OpenCV windows to display frames.
     Press 'q' to quit.
     """
     lf = LineFollower()
-    cap = cv2.VideoCapture(sample_video)
+    path = "/home/developer/ros2_ws/src/camera_package/camera_package/test_video.avi"
+    cap = cv2.VideoCapture(path)
     assert cap.isOpened(), "Failed to open test video"
 
     print("\nManual Line Follower Test Started.")
@@ -88,9 +71,7 @@ def test_line_follower_manual_display(sample_video):
         lf.process_frame(frame)
 
         # small wait to make display visible
-        if cv2.waitKey(100) & 0xFF == ord('q'):
-            print("Manual test interrupted by user.")
-            break
+        cv2.waitKey(10)
 
     cap.release()
     cv2.destroyAllWindows()
