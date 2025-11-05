@@ -8,29 +8,46 @@ class LineFollower:
         pass
     
     def process_frame(self, frame):
-      low_b = np.uint8([5,5,5])
-      high_b = np.uint8([0,0,0])
-      mask = cv2.inRange(frame, high_b, low_b)
-      contours, hierarchy = cv2.findContours(mask, 1, cv2.CHAIN_APPROX_NONE)
-      if len(contours) > 0 :
-          c = max(contours, key=cv2.contourArea)
-          M = cv2.moments(c)
-          if M["m00"] !=0 :
-              cx = int(M['m10']/M['m00'])
-              cy = int(M['m01']/M['m00'])
-              print("CX : "+str(cx)+"  CY : "+str(cy))
-              if cx >= 120 :
-                  print("Turn Left")
-              if cx < 120 and cx > 40 :
-                  print("On Track!")
-              if cx <=40 :
-                  print("Turn Right")
-              cv2.circle(frame, (cx,cy), 5, (255,255,255), -1)
-      else :
-          print("I don't see the line")
-      cv2.drawContours(frame, c, -1, (0,255,0), 1)
-      cv2.imshow("Mask",mask)
-      cv2.imshow("Frame",frame)
+        # Convert the image from BGR (OpenCV default) to HSV
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        
+        # Define yellow color range in HSV
+        # (tune these if lighting varies)
+        lower_yellow = np.array([20, 100, 100])
+        upper_yellow = np.array([40, 255, 255])
+        
+        # Create a mask selecting only yellow parts
+        mask = cv2.inRange(hsv, lower_yellow, upper_yellow)
+
+        # Find contours of the yellow areas
+        contours, hierarchy = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+        
+        if len(contours) > 0:
+            # Get the largest contour (most likely the line)
+            c = max(contours, key=cv2.contourArea)
+            M = cv2.moments(c)
+            if M["m00"] != 0:
+                cx = int(M['m10'] / M['m00'])
+                cy = int(M['m01'] / M['m00'])
+                print(f"CX: {cx}  CY: {cy}")
+                
+                # Simple steering logic
+                if cx >= 120:
+                    print("Turn Left")
+                elif 40 < cx < 120:
+                    print("On Track!")
+                else:
+                    print("Turn Right")
+                
+                # Draw visual markers
+                cv2.circle(frame, (cx, cy), 5, (255, 255, 255), -1)
+                cv2.drawContours(frame, [c], -1, (0, 255, 0), 1)
+        else:
+            print("I don't see the yellow line")
+        
+        # Show the images
+        cv2.imshow("Mask", mask)
+        cv2.imshow("Frame", frame)
 
 
 @pytest.fixture
