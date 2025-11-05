@@ -18,6 +18,12 @@
   <exec_depend>cv2</exec_depend>
   <exec_depend>numpy</exec_depend>
 
+  <!-- exec_depend nazwa bibloteki  -->
+  <!-- by dwa pliki sie widzialy to tez-->
+
+  <!-- model/samochod/cmd-vel-->
+  <!-- image display-->
+
   <export>
     <build_type>ament_python</build_type>
   </export>
