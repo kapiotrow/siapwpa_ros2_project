@@ -1,4 +1,7 @@
 from setuptools import find_packages, setup
+from launch import LaunchDescription
+from launch_ros.actions import Node
+
 
 package_name = 'camera_package'
 
@@ -10,6 +13,7 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
+        ('share/' + package_name + '/launch', ['launch/bridge.launch.py']),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
