@@ -44,11 +44,11 @@ class LineFollower:
                     print(f"CX: {cx}  CY: {cy}")
 
                     # Determine direction
-                    if cx >= center_x + 20:
+                    if cx <= center_x - 20:
                         direction = "Turn Left"
                         arrow_end = (center_x - 50, height - 100)
                         color = (0, 0, 255)
-                    elif cx <= center_x - 20:
+                    elif cx >= center_x + 20:
                         direction = "Turn Right"
                         arrow_end = (center_x + 50, height - 100)
                         color = (255, 0, 0)
