@@ -23,6 +23,7 @@ class RGBCameraSubscriber(Node):
             10)
         self.subscription  # prevent unused variable warning
         self.line_follower = LineFollower()
+        self.directions_vector = [0.0, 0.0, 0.0]
 
     def listener_callback(self, msg):
         try:
@@ -30,8 +31,10 @@ class RGBCameraSubscriber(Node):
         except Exception as e:
             print("Error converting ROS Image to OpenCV: %s", e)
 
-        self.line_follower.process_frame(cv_image)
+        self.directions_vector  = self.line_follower.process_frame(cv_image)
         cv2.waitKey(1)  # Required to update the OpenCV window
+        
+        
 
 class DepthCameraSubscriber(Node):
     

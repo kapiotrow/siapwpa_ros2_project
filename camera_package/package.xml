@@ -17,6 +17,7 @@
   <exec_depend>sensor_msgs</exec_depend>
   <exec_depend>cv2</exec_depend>
   <exec_depend>numpy</exec_depend>
+  <exec_depend>camera-subscriber</exec_depend>
 
   <!-- exec_depend nazwa bibloteki  -->
   <!-- by dwa pliki sie widzialy to tez-->

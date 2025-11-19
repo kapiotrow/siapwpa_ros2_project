@@ -1,5 +1,6 @@
 import rclpy
 from rclpy.node import Node
+from camera_subscriber import RGBCameraSubscriber
 import cv2
 import numpy as np
 
@@ -15,15 +16,29 @@ class velocityPublisher(Node):
         timer_period = 0.5  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
         self.i = 0
+        self.subscriber = RGBCameraSubscriber()
+
+        rclpy.spin(self.subscriber)
+        print(1)
 
     def timer_callback(self):
+
+        directions = self.subscriber.directions_vector
+        visibility = directions[0]
+        offset = directions[1]
+
+        max_speed_forward = 3.0  # m/s
+        max_speed_sideways = 1.5  # m/s
+        
         msg = Twist()
-        msg.linear.x = 0.0  # rotate-right (positive), rotate-left (negative)
-        msg.linear.y = 0.0  # forward (positive), backward (negative)
-        msg.linear.z = 1.0
+        msg.linear.x = max_speed_sideways * offset  # rotate-right (positive), rotate-left (negative)
+        msg.linear.y = max_speed_forward * visibility  # forward (positive), backward (negative)
+        msg.linear.z = 0.0
         msg.angular.x = 0.0
         msg.angular.y = 0.0
         msg.angular.z = 0.0
+
+        
 
         self.publisher_.publish(msg)
         self.get_logger().info(f'Publishing sideways velocity: {msg.linear.x} m/s')

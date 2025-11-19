@@ -3,10 +3,19 @@ import numpy as np
 import pytest
 from unittest.mock import patch
 import time
+from collections import deque
 
 class LineFollower:
     def __init__(self):
         self.last_vector = [0.5, 0.0, 0.0]  # Default output (searching)
+        self.P = 0.8
+        self.I = 0.005
+        self.I_accumulator = 0.0
+        self.D = 0.1
+        self.D_prev_value = 0.0
+
+        self.I_window_size = 30           # number of samples to integrate
+        self.I_buffer = deque(maxlen=self.I_window_size)
     
     def process_frame(self, frame):
         # Default output
@@ -35,12 +44,18 @@ class LineFollower:
             if len(contours) > 0:
                 # Largest contour (most likely the line)
                 contours = sorted(contours, key=cv2.contourArea, reverse=True)
-                c = contours[0]
-                M = cv2.moments(c)
+                c0 = contours[0]
+                c1 = contours[1]
+                c2 = contours[2]
+                M0 = cv2.moments(c0)
+                M1 = cv2.moments(c1)
+                M2 = cv2.moments(c2)
 
-                if M["m00"] != 0:
-                    cx = int(M['m10'] / M['m00'])
-                    cy = int(M['m01'] / M['m00'])
+                if M0["m00"] != 0:
+                    M_avg = lambda M_l: (M_l[0] + M_l[1]) / 2
+
+                    cx = int(M_avg([M0['m10'], M1['m10'], M2['m10']]) / M_avg([M0['m00'], M1['m00'], M2['m00']]))
+                    cy = int(M_avg([M0['m01'], M1['m01'], M2['m01']]) / M_avg([M0['m00'], M1['m00'], M2['m00']]))
 
                     # Compute normalized direction: -1 (left) to +1 (right)
                     offset = (cx - center_x) / (center_x)
@@ -56,7 +71,9 @@ class LineFollower:
                     # Visual feedback
                     color = (0, 255, 0)
                     cv2.circle(frame, (cx, cy), 5, (255, 255, 255), -1)
-                    cv2.drawContours(frame, [c], -1, (0, 255, 0), 1)
+                    cv2.drawContours(frame, [c0], -1, (0, 255, 0), 1)
+                    cv2.drawContours(frame, [c1], -1, (0, 255, 0), 1)
+                    cv2.drawContours(frame, [c2], -1, (0, 255, 0), 1)
                     cv2.arrowedLine(frame, (center_x, height - 50),
                                     (int(center_x + offset * 100), height - 120),
                                     color, 4, tipLength=0.4)
@@ -76,11 +93,33 @@ class LineFollower:
             output_vector = [0.5, 0.0, 0.0]
 
         # Display for debugging
-        cv2.imshow("Mask", mask)
+        # cv2.imshow("Mask", mask)
         cv2.imshow("Frame", frame)
         cv2.waitKey(1)
 
         return output_vector
+        
+    def pid_control(self, frame):
+        info_vector = self.process_frame(frame)
+
+        error = info_vector[1]
+
+        # --- Integral term (rolling buffer) ---
+        self.I_buffer.append(error)
+        I_term = sum(self.I_buffer)
+
+        # --- Derivative term ---
+        D_term = error - self.D_prev_value
+        self.D_prev_value = error
+
+        # --- PID output ---
+        yaw = self.P * error + self.I * I_term + self.D * D_term
+
+        return [info_vector[0], yaw, 0.0]
+
+
+
+
 
 def test_line_follower_manual_display():
     """
