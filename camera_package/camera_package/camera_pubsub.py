@@ -82,9 +82,9 @@ class VelocityPublisher(Node):
 
             # forward/back
             if 'w' in self.keys:
-                msg.angular.z  = max_speed_forward
+                msg.angular.z  = -max_speed_forward//2
             elif 's' in self.keys:
-                msg.angular.z  = -max_speed_forward
+                msg.angular.z  = max_speed_forward//2
 
             # left/right
             if 'a' in self.keys:
