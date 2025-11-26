@@ -1,3 +1,6 @@
 [submodule "realsense-ros"]
 	path = realsense-ros
 	url = https://github.com/IntelRealSense/realsense-ros.git
+[submodule "src/velodyne_simulator"]
+	path = src/velodyne_simulator
+	url = https://github.com/lmark1/velodyne_simulator.git
