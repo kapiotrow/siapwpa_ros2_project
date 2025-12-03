@@ -1,13 +1,13 @@
 import cv2
 import numpy as np
-from camera_package.Controllers import PIDController, LQRController
-from camera_package.FrameProcessors import BaseLineProcessor, LineKalmanProcessor
+from Controllers import PIDController, LQRController
+from FrameProcessors import BaseLineProcessor, LineKalmanProcessor
 import pytest
 
 class LineFollower:
     def __init__(self):
         self.processor = LineKalmanProcessor()
-        self.controller = LQRController()
+        self.controller = PIDController()
         self.controller.attach_processor(self.processor)
 
     def update(self, frame):
