@@ -32,6 +32,17 @@ def generate_launch_description():
             arguments=[
                 '/model/samochod/cmd_vel@geometry_msgs/msg/Twist@gz.msgs.Twist'
             ]
+        ),
+        # Bridge dla Velodyne LiDAR
+        # Bridge dla Velodyne LiDAR
+        Node(
+            package='ros_gz_bridge',
+            executable='parameter_bridge',
+            name='velodyne_lidar_bridge',
+            output='screen',
+            arguments=[
+                '/world/mecanum_drive/model/samochod/link/base_footprint/sensor/velodyne_lidar/scan@sensor_msgs/msg/LaserScan@gz.msgs.LaserScan'
+            ]
         )
 
     ])
