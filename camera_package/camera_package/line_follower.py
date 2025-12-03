@@ -1,122 +1,20 @@
 import cv2
 import numpy as np
+from camera_package.Controllers import PIDController, LQRController
+from camera_package.FrameProcessors import BaseLineProcessor, LineKalmanProcessor
 import pytest
-from unittest.mock import patch
-import time
-from collections import deque
 
 class LineFollower:
     def __init__(self):
-        self.last_vector = [0.5, 0.0, 0.0]  # Default output (searching)
-        self.P = 0.8
-        self.I = 0.005
-        self.I_accumulator = 0.0
-        self.D = 0.1
-        self.D_prev_value = 0.0
+        self.processor = LineKalmanProcessor()
+        self.controller = LQRController()
+        self.controller.attach_processor(self.processor)
 
-        self.I_window_size = 30           # number of samples to integrate
-        self.I_buffer = deque(maxlen=self.I_window_size)
-    
-    def process_frame(self, frame):
-        # Default output
-        output_vector = [0.5, 0.0, 0.0]
-        
-        try:
-            if frame is None or frame.size == 0:
-                print("Warning: Empty frame.")
-                return self.last_vector
-
-            # Convert to HSV color space
-            hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-
-            # Define yellow range
-            lower_yellow = np.array([15, 80, 80])
-            upper_yellow = np.array([45, 255, 255])
-
-            # Mask for yellow line
-            mask = cv2.inRange(hsv, lower_yellow, upper_yellow)
-
-            # Find contours
-            contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-            height, width, _ = frame.shape
-            center_x = width // 2
-
-            if len(contours) > 0:
-                # Largest contour (most likely the line)
-                contours = sorted(contours, key=cv2.contourArea, reverse=True)
-                c0 = contours[0]
-                c1 = contours[1]
-                c2 = contours[2]
-                M0 = cv2.moments(c0)
-                M1 = cv2.moments(c1)
-                M2 = cv2.moments(c2)
-
-                if M0["m00"] != 0:
-                    M_avg = lambda M_l: (M_l[0] + M_l[1]) / 2
-
-                    cx = int(M_avg([M0['m10'], M1['m10'], M2['m10']]) / M_avg([M0['m00'], M1['m00'], M2['m00']]))
-                    cy = int(M_avg([M0['m01'], M1['m01'], M2['m01']]) / M_avg([M0['m00'], M1['m00'], M2['m00']]))
-
-                    # Compute normalized direction: -1 (left) to +1 (right)
-                    offset = (cx - center_x) / (center_x)
-                    offset = np.clip(offset, -1.0, 1.0)
-
-                    # Visibility = 1 (line seen)
-                    visibility = 1.0
-
-                    # Build output vector
-                    output_vector = [visibility, offset, 0.0]
-                    self.last_vector = output_vector
-
-                    # Visual feedback
-                    color = (0, 255, 0)
-                    cv2.circle(frame, (cx, cy), 5, (255, 255, 255), -1)
-                    cv2.drawContours(frame, [c0], -1, (0, 255, 0), 1)
-                    cv2.drawContours(frame, [c1], -1, (0, 255, 0), 1)
-                    cv2.drawContours(frame, [c2], -1, (0, 255, 0), 1)
-                    cv2.arrowedLine(frame, (center_x, height - 50),
-                                    (int(center_x + offset * 100), height - 120),
-                                    color, 4, tipLength=0.4)
-                    cv2.putText(frame, f"Dir: {offset:+.2f}", (30, 40),
-                                cv2.FONT_HERSHEY_SIMPLEX, 1, color, 2, cv2.LINE_AA)
-                else:
-                    print("Invalid contour (m00=0).")
-                    output_vector = [0.5, 0.0, 0.0]
-
-            else:
-                # No line found
-                print("Line lost — waiting for it to reappear...")
-                output_vector = [0.5, 0.0, 0.0]
-
-        except Exception as e:
-            print(f"⚠️ Exception: {e}")
-            output_vector = [0.5, 0.0, 0.0]
-
-        # Display for debugging
-        # cv2.imshow("Mask", mask)
-        cv2.imshow("Frame", frame)
-        cv2.waitKey(1)
-
-        return output_vector
-        
-    def pid_control(self, frame):
-        info_vector = self.process_frame(frame)
-
-        error = info_vector[1]
-
-        # --- Integral term (rolling buffer) ---
-        self.I_buffer.append(error)
-        I_term = sum(self.I_buffer)
-
-        # --- Derivative term ---
-        D_term = error - self.D_prev_value
-        self.D_prev_value = error
-
-        # --- PID output ---
-        yaw = self.P * error + self.I * I_term + self.D * D_term
-
-        return [info_vector[0], yaw, 0.0]
-
+    def update(self, frame):
+        """
+        Full pipeline: Frame → Processor → PIDControl
+        """
+        return self.controller.compute(frame)
 
 
 
@@ -143,7 +41,7 @@ def test_line_follower_manual_display():
             break
 
         # Process frame and get output vector
-        output_vector = lf.process_frame(frame)
+        output_vector = lf.update(frame)
 
         # Print output for debugging
         print(f"Frame {frame_count:04d} — Output: {output_vector}")
@@ -159,3 +57,4 @@ def test_line_follower_manual_display():
     cap.release()
     cv2.destroyAllWindows()
     print("Test completed successfully.\n")
+
