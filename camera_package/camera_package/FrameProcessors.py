@@ -17,15 +17,39 @@ class BaseLineProcessor(FrameProcessor):
     def __init__(self):
         self.last_vector = [0.5, 0.0, 0.0]
 
-    def visualize_input(self, frame, offset):
+    def visualize_input(self, frame, offset, control_vector=None):
         """
-        Draw steering visualization.
+        Draw steering visualization and optionally all 3 control values.
+
+        control_vector = [visibility, steering, forward_speed]
         """
         h, w, _ = frame.shape
         cx = w // 2
+
+        # --- Draw lateral offset arrow (steering) ---
         steer_x = int(cx + offset * cx)
         cv2.line(frame, (cx, h - 20), (steer_x, h - 20), (0, 0, 255), 3)
         cv2.circle(frame, (steer_x, h - 20), 6, (0, 0, 255), -1)
+        cv2.putText(frame, f"Offset: {offset:+.2f}", (30, 30),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 2)
+
+        if control_vector is not None:
+            visibility, steering, fwd_speed = control_vector
+
+            # --- Steering / yaw arrow ---
+            arrow_length = int(steering * 100)
+            cv2.arrowedLine(frame, (cx, h - 60), (cx + arrow_length, h - 120),
+                            (255, 0, 0), 3, tipLength=0.4)
+            cv2.putText(frame, f"Steering: {steering:+.2f}", (30, 60),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 0, 0), 2)
+
+            # --- Forward speed visualization ---
+            speed_bar_length = int(fwd_speed * 100)
+            cv2.rectangle(frame, (30, h - 100), (30 + speed_bar_length, h - 90),
+                          (0, 255, 0), -1)
+            cv2.putText(frame, f"Speed: {fwd_speed:+.2f}", (30, h - 110),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+
 
     def process(self, frame):
         """
@@ -79,7 +103,7 @@ class BaseLineProcessor(FrameProcessor):
 
         # visualization
         visibility, offset, _ = output
-        self.visualize_input(frame, offset)
+        self.visualize_input(frame, offset, output)
 
         cv2.imshow("Frame", frame)
         cv2.waitKey(1)
