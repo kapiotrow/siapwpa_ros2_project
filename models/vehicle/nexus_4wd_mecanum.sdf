@@ -249,37 +249,6 @@
 
       </sensor>
 
-      <link name="velodyne_lidar_link">
-        <inertial>
-          <pose>0 0 0 0 0 0</pose>
-          <mass>1.0</mass>
-          <inertia>
-            <ixx>0.01</ixx>
-            <ixy>0.0</ixy>
-            <ixz>0.0</ixz>
-            <iyy>0.01</iyy>
-            <iyz>0.0</iyz>
-            <izz>0.01</izz>
-          </inertia>
-        </inertial>
-        <collision name="velodyne_lidar_collision">
-          <geometry>
-            <sphere>
-              <radius>0.1</radius>
-            </sphere>
-          </geometry>
-        </collision>
-        <visual name="velodyne_lidar_visual">
-          <geometry>
-            <mesh>
-              <uri>model://velodyne_lidar/mesh.dae</uri>
-              <scale>1 1 1</scale>
-            </mesh>
-          </geometry>
-        </visual>
-      </link>
-
-
       <sensor name="velodyne_lidar" type="gpu_ray">   <!-- albo `ray`, w zależności od wersji -->
         <pose>0.8 0 0.4 0 0 3.14598</pose>   <!-- dostosuj wysokość / orientację -->
         <update_rate>10</update_rate>
@@ -344,11 +313,7 @@
     </link>
 
     
-    <joint name="velodyne_lidar_joint" type="fixed">
-    <parent>base_link</parent>
-    <child>velodyne_lidar_link</child>
-    <pose>0.8 0 0.4 0 0 0</pose>  <!-- Dostosuj pozycję w zależności od potrzeby -->
-  </joint>
+
 
     <!-- Joints and wheel-links (lower-left, lower-right, upper-left, upper-right) -->
     <joint name='lower_left_wheel_joint' type='revolute'>
