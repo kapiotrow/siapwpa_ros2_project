@@ -1,0 +1,91 @@
+############################
+# ROS Workspace
+############################
+
+# Catkin / Colcon build artifacts
+build/
+devel/
+install/
+log/
+
+# ROS 2 logs
+logs/
+
+# Catkin tools
+.catkin_tools/
+
+# Colcon
+.colcon/
+.colcon_tools/
+Testing/
+
+# ROS message/service build outputs
+msg_gen/
+srv_gen/
+msg/
+srv/
+
+# Python package build artifacts
+*.egg-info/
+*.pyc
+*.pyo
+__pycache__/
+*.swp
+*.swo
+
+# VSCode Python cache
+.pytest_cache/
+.ipynb_checkpoints/
+
+############################
+# Gazebo / Ignition / Gz
+############################
+
+# Gazebo Classic
+~/.gazebo/models/
+*.world~
+*.model~
+
+# Ignition / Gazebo Sim (Gz)
+.gz/
+ignition/
+gz/
+
+# Simulation logs
+*.log
+*.state
+*.recording
+
+############################
+# CMake / Build System
+############################
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+CTestTestfile.cmake
+
+############################
+# Launch, maps, and generated data
+############################
+*.db
+*.bag
+*.bag.active
+*.bag.tmp
+*.metadata
+*.osm
+*.pgm
+*.yaml
+
+############################
+# IDE / Editor Files
+############################
+.idea/
+*.user
+*.kate-swp
+
+############################
+# System / Misc
+############################
+*.DS_Store
+Thumbs.db
