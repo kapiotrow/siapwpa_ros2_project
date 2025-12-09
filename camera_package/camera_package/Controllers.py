@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import numpy as np
 from collections import deque
-from camera_package.FrameProcessors import FrameProcessor
+from FrameProcessors import FrameProcessor
 from scipy.linalg import solve_discrete_are
 
 class Controller(ABC):
@@ -125,7 +125,7 @@ class LQRController(Controller):
         x = np.array([[offset], [offset_rate]])
 
         # LQR control law: u = -Kx
-        u = float(-(self.K @ x))
+        u = float((self.K @ x))
 
         # Clip steering
         u = np.clip(u, -1.0, 1.0)

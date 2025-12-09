@@ -65,7 +65,7 @@ class VelocityPublisher(Node):
 
     def camera_callback(self, msg):
         cv_image = bridge.imgmsg_to_cv2(msg, 'bgr8')
-        self.directions_vector = self.line_follower.pid_control(cv_image)
+        self.directions_vector = self.line_follower.update(cv_image)
 
 
     def timer_callback(self):

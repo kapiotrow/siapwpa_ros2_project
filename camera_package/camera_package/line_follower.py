@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
-from camera_package.Controllers import PIDController, LQRController
-from camera_package.FrameProcessors import BaseLineProcessor, LineKalmanProcessor
+from Controllers import PIDController, LQRController
+from FrameProcessors import BaseLineProcessor, LineKalmanProcessor
 import pytest
 
 class LineFollower:
