@@ -7,7 +7,7 @@ import pytest
 class LineFollower:
     def __init__(self):
         self.processor = LineKalmanProcessor()
-        self.controller = LQRController()
+        self.controller = PIDController()
         self.controller.attach_processor(self.processor)
 
     def update(self, frame):

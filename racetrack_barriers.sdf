@@ -98,7 +98,7 @@
 
   <include>
     <uri>model://models/vehicle/nexus_4wd_mecanum.sdf</uri>
-    <pose>-8 4 0.01 0 0 1.57</pose>
+    <pose>-14 0 0.01 0 0 1.57</pose>
     <name>samochod</name>
   </include>
   
