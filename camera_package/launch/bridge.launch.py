@@ -60,5 +60,15 @@ def generate_launch_description():
                 '/world/mecanum_drive/model/samochod/link/base_footprint/sensor/velodyne_lidar/scan/points'
                 '@sensor_msgs/msg/PointCloud2@gz.msgs.PointCloudPacked'
             ]
+        ),
+        Node(
+            package='ros_gz_bridge',
+            executable='parameter_bridge',
+            name='pose_info_bridge',
+            output='screen',
+            arguments=[
+                '/world/mecanum_drive/pose/info'
+                '@geometry_msgs/msg/PoseArray@gz.msgs.Pose_V'
+            ]
         )
     ])
