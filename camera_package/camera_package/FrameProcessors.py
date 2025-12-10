@@ -104,10 +104,10 @@ class BaseLineProcessor(FrameProcessor):
 
         # visualization
         visibility, offset, _ = output
-        self.visualize_input(frame, offset, output)
+        # self.visualize_input(frame, offset, output)
 
-        cv2.imshow("Frame", frame)
-        cv2.waitKey(1)
+        # cv2.imshow("Frame", frame)
+        # cv2.waitKey(1)
 
         return output
 

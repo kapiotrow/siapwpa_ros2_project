@@ -17,7 +17,7 @@ class Controller(ABC):
         pass
 
 class PIDController:
-    def __init__(self, P=0.8, I=0.0, D=0.12, history_length=10):
+    def __init__(self, P=1, I=0.0, D=0.12, history_length=10):
         self.P = P
         self.I = I
         self.D = D
