@@ -6,5 +6,7 @@ tmux new-session \; \
   send-keys "sleep 1;. ./sourceme.sh $1; gz sim racetrack.sdf" C-m \; \
   split-window -v \; \
   send-keys "sleep 3; . ./sourceme.sh $1; python3 camera_package/camera_package/camera_pubsub.py" C-m \; \
+  split-window -h \; \
+  send-keys "sleep 1;. ./sourceme.sh $1; python3 racetrack_evaluator/position_subscriber.py" C-m \; \
   select-layout tiled
 
