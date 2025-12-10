@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import numpy as np
 from collections import deque
-from camera_package.FrameProcessors import FrameProcessor
+from FrameProcessors import FrameProcessor
 from scipy.linalg import solve_discrete_are
 
 class Controller(ABC):
@@ -17,7 +17,7 @@ class Controller(ABC):
         pass
 
 class PIDController:
-    def __init__(self, P=0.3, I=0.0, D=0.12, history_length=10):
+    def __init__(self, P=0.8, I=0.0, D=0.12, history_length=10):
         self.P = P
         self.I = I
         self.D = D
@@ -130,5 +130,5 @@ class LQRController(Controller):
         # Clip steering
         u = np.clip(u, -1.0, 1.0)
 
-        return [visibility, u, 0.0]
+        return [visibility, -u, 0.0]
 
