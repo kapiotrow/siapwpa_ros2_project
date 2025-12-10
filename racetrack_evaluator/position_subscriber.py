@@ -59,7 +59,7 @@ class PoseInfoSubscriber(Node):
             PoseArray,
             POSE_TOPIC,
             self.listener_callback,
-            10
+            100
         )
 
         # trajectory
@@ -87,8 +87,9 @@ class PoseInfoSubscriber(Node):
         curve_3 = create_circle_angle((3.8, 1.0), points[3], np.pi/2 - 0.55, R_1, N_1)
         curve_4 = np.flipud(create_circle_angle((points[5, 0], points[6, 1]), points[6], -np.pi/2 - 0.55, R_1, N_1))
 
-        center_line = np.vstack([curve_1, curve_2, curve_3, curve_4])
-        center_line = np.array([line*6 + [-7.5, -7.5] for line in center_line], dtype=np.float32)
+        center_line = np.vstack([[0, 2], curve_1, curve_2, curve_3, curve_4, [0, 2]])
+
+        center_line = np.array([line*5.78 + [-7.59, -7.64] for line in center_line], dtype=np.float32)
 
         self.track = center_line
 
@@ -123,7 +124,7 @@ class PoseInfoSubscriber(Node):
         self.traj_x.append(x)
         self.traj_y.append(y)
 
-        self.get_logger().info(f"Robot: X={x:.2f}, Y={y:.2f}")
+        # self.get_logger().info(f"Robot: X={x:.2f}, Y={y:.2f}")
 
         # update trajectory line
         self.line.set_xdata(self.traj_x)

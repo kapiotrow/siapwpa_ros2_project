@@ -95,8 +95,8 @@ def main():
   curve_3 = create_circle_angle((3.8, 1.0), points[3], np.pi/2-0.55, R_1, N_1)
   curve_4 = np.flipud(create_circle_angle((points[5,0],points[6,1]), points[6], -np.pi/2-0.55, R_1, N_1))
 
-  center_line = np.vstack([[0,0],curve_1,curve_2,curve_3,curve_4,[0,0]], dtype=np.float32)
-  center_line = [line*6 + [-10.0, -10.0] for line in center_line]
+  center_line = np.vstack([[0,2],curve_1,curve_2,curve_3,curve_4,[0,2]], dtype=np.float32)
+  center_line = [line*6 + [-8.0, -8.0] for line in center_line]
   print(center_line)
   l_center_line = LineString(center_line)
 
