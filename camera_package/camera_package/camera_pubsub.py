@@ -1,21 +1,21 @@
 import rclpy
 from rclpy.node import Node
-from camera_subscriber import RGBCameraSubscriber
+# from camera_subscriber import RGBCameraSubscriber
 import cv2
 from cv_bridge import CvBridge
-from line_follower import LineFollower
+from .line_follower import LineFollower
 from sensor_msgs.msg import Image
-import sensor_msgs_py.point_cloud2 as pc2
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import LaserScan
 
 from pynput import keyboard as kb
 import numpy as np
+import math
 
 import time 
 from enum import Enum
 
-TOPIC_LIDAR = '/world/mecanum_drive/model/samochod/link/base_footprint/sensor/velodyne_lidar/scan/points'
+TOPIC_LIDAR = '/world/mecanum_drive/model/samochod/link/base_footprint/sensor/velodyne_lidar/scan'
 VEL_TOPIC = '/model/samochod/cmd_vel'
 TOPIC_RGB = '/world/mecanum_drive/model/samochod/link/base_footprint/sensor/realsense_rgbd/image'
 TOPIC_DEPTH = '/world/mecanum_drive/model/samochod/link/base_footprint/sensor/realsense_depth/depth_image'
@@ -50,7 +50,7 @@ class VelocityPublisher(Node):
         # dist
         self.min_front = 10.0
         self.min_left = 10.0
-        self.min_right = 10.0
+        self.min_right = 10.
 
         # SUBSKRYBER W TYM SAMYM NODE
         self.subscription = self.create_subscription(
@@ -106,23 +106,28 @@ class VelocityPublisher(Node):
 
 
     def lidar_callback(self, msg):
-        pts = np.array([[p[0], p[1]]
-                        for p in pc2.read_points(
-                            msg, field_names=("x", "y"), skip_nans=True)])
+        ranges = np.array(msg.ranges)
 
-        if len(pts) == 0:
-            return
+        # zabezpieczenie przed inf / nan
+        ranges = np.where(np.isinf(ranges), msg.range_max, ranges)
+        ranges = np.where(np.isnan(ranges), msg.range_max, ranges)
 
-        angles = np.arctan2(pts[:, 1], pts[:, 0])
-        dists = np.linalg.norm(pts, axis=1)
+        angles = msg.angle_min + np.arange(len(ranges)) * msg.angle_increment
 
-        front = np.abs(angles) < self.front_angle
-        left = angles > self.front_angle
-        right = angles < -self.front_angle
+        # sektory kątowe
+        front_mask = np.abs(angles) < math.radians(15)
+        left_mask  = (angles > math.radians(15)) & (angles < math.radians(90))
+        right_mask = (angles < -math.radians(15)) & (angles > -math.radians(90))
 
-        self.min_front = np.min(dists[front]) if np.any(front) else 10.0
-        self.min_left = np.min(dists[left]) if np.any(left) else 10.0
-        self.min_right = np.min(dists[right]) if np.any(right) else 10.0
+        self.min_front = np.min(ranges[front_mask]) if np.any(front_mask) else msg.range_max
+        self.min_left  = np.min(ranges[left_mask])  if np.any(left_mask)  else msg.range_max
+        self.min_right = np.min(ranges[right_mask]) if np.any(right_mask) else msg.range_max
+
+        self.get_logger().info(f"Received LIDAR data:")
+        self.get_logger().info(f"Angle min: {msg.angle_min}")
+        self.get_logger().info(f"Angle max: {msg.angle_max}")
+        self.get_logger().info(f"Number of ranges: {len(msg.ranges)}")
+        self.get_logger().info(f"Ranges (first 10 points): {msg.ranges[:10]}")
 
 
     def timer_callback(self):
@@ -134,12 +139,12 @@ class VelocityPublisher(Node):
         # ==========================
         # STATE: LINE FOLLOWING
         # ==========================
-        if self.avoid_state == AvoidState.LINE:
-            if self.front_obstacle:
+        if self.state == AvoidState.LINE:
+            if self.min_front < self.dist_thresh:
                 # decide turn direction
                 self.turn_dir = +1 if self.left_dist > self.right_dist else -1
                 self.turn_memory = 0.0
-                self.avoid_state = AvoidState.TURN_AWAY
+                self.avoid = AvoidState.TURN_AWAY
                 return
 
             # normal line following

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import numpy as np
 from collections import deque
-from FrameProcessors import FrameProcessor
+from .FrameProcessors import FrameProcessor
 from scipy.linalg import solve_discrete_are
 
 class Controller(ABC):
