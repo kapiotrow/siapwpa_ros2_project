@@ -41,16 +41,35 @@ def create_circle_angle(c, start, angle, R, N):
 def print_border(ax, waypoints):
     line = LineString(waypoints)
     xs, ys = line.xy
-    ax.plot(xs, ys, color="white", linewidth=2)
+    ax.plot(xs, ys, color="white", linewidth=2, marker='o', markersize=4, linestyle='-')
 
 # ---------------- ROS2 CONFIG --------------------------
 
 POSE_TOPIC = '/world/mecanum_drive/pose/info'
 ROBOT_INDEX = 2   # ← ten indeks zmień jeśli robot będzie w innym miejscu tablicy
 
+def point_to_segment_distance(px, py, ax, ay, bx, by):
+    """Zwrot: odległość punktu P od odcinka AB"""
+    A = np.array([ax, ay], dtype=float)
+    B = np.array([bx, by], dtype=float)
+    P = np.array([px, py], dtype=float)
+
+    AB = B - A
+    AP = P - A
+
+    # rzutowanie AP na AB — parametr t
+    t = np.dot(AP, AB) / np.dot(AB, AB)
+    t = max(0.0, min(1.0, t))  # ograniczenie do [0,1]
+
+    closest = A + t * AB
+    return np.linalg.norm(P - closest)
+
+
 # ---------------- SUBSCRIBER NODE ----------------------
 
 class PoseInfoSubscriber(Node):
+
+    
 
     def __init__(self):
         super().__init__('pose_info_subscriber')
@@ -87,9 +106,15 @@ class PoseInfoSubscriber(Node):
         curve_3 = create_circle_angle((3.8, 1.0), points[3], np.pi/2 - 0.55, R_1, N_1)
         curve_4 = np.flipud(create_circle_angle((points[5, 0], points[6, 1]), points[6], -np.pi/2 - 0.55, R_1, N_1))
 
-        center_line = np.vstack([[0, 2], curve_1, curve_2, curve_3, curve_4, [0, 2]])
+        
+
+        center_line = np.vstack([[0, 2], curve_4[::-1], curve_3[::-1], curve_2[::-1], curve_1[::-1], [0, 2]])
 
         center_line = np.array([line*5.78 + [-7.59, -7.64] for line in center_line], dtype=np.float32)
+        print(center_line)
+
+
+        print(len(center_line))
 
         self.track = center_line
 
@@ -107,7 +132,7 @@ class PoseInfoSubscriber(Node):
         print_border(self.ax, self.track)
 
         # trajectory line
-        self.line, = self.ax.plot([], [], 'r-', linewidth=2)
+        self.line, = self.ax.plot([], [], 'ro-', linewidth=2)
 
     # ---------------- CALLBACK -----------------------------
 
@@ -124,7 +149,7 @@ class PoseInfoSubscriber(Node):
         self.traj_x.append(x)
         self.traj_y.append(y)
 
-        # self.get_logger().info(f"Robot: X={x:.2f}, Y={y:.2f}")
+        self.get_logger().info(f"Robot: X={x:.2f}, Y={y:.2f}")
 
         # update trajectory line
         self.line.set_xdata(self.traj_x)
