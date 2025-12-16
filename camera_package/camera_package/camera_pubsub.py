@@ -4,17 +4,48 @@ from camera_subscriber import RGBCameraSubscriber
 import cv2
 from cv_bridge import CvBridge
 from line_follower import LineFollower
-from sensor_msgs.msg import Image 
+from sensor_msgs.msg import Image
+import sensor_msgs_py.point_cloud2 as pc2
 from geometry_msgs.msg import Twist
+from sensor_msgs.msg import LaserScan
 
 from pynput import keyboard as kb
+import numpy as np
 
 import time 
+from enum import Enum
+import logging
+import os
+import datetime
 
+TOPIC_LIDAR = '/world/mecanum_drive/model/samochod/link/base_footprint/sensor/velodyne_lidar/scan/points'
 VEL_TOPIC = '/model/samochod/cmd_vel'
 TOPIC_RGB = '/world/mecanum_drive/model/samochod/link/base_footprint/sensor/realsense_rgbd/image'
 TOPIC_DEPTH = '/world/mecanum_drive/model/samochod/link/base_footprint/sensor/realsense_depth/depth_image'
 bridge = CvBridge()
+
+log_dir = os.path.expanduser("ros2_logs")
+os.makedirs(log_dir, exist_ok=True)
+
+log_file = os.path.join(
+    log_dir,
+    f"velocity_publisher_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+)
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.FileHandler(log_file),
+        logging.StreamHandler()  # optional: also print to terminal
+    ]
+)
+
+class AvoidState(Enum):
+    LINE = 0
+    TURN_AWAY = 1
+    PASS = 2
+    TURN_BACK = 3
 
 
 class VelocityPublisher(Node):
@@ -24,6 +55,21 @@ class VelocityPublisher(Node):
 
         self.publisher_ = self.create_publisher(Twist, VEL_TOPIC, 10)
         self.timer = self.create_timer(0.5, self.timer_callback)
+        self.dt = 0.5
+
+        # angles
+        self.front_angle = 0.26  # ~15°
+        self.dist_thresh = 1.0
+
+        self.state = AvoidState.LINE
+        self.turn_dir = 0        # +1 lewo, -1 prawo
+        self.turn_memory = 0.0
+        self.turn_speed = 0.8    # rad/s
+
+        # dist
+        self.min_front = 10.0
+        self.min_left = 10.0
+        self.min_right = 10.0
 
         # SUBSKRYBER W TYM SAMYM NODE
         self.subscription = self.create_subscription(
@@ -32,6 +78,16 @@ class VelocityPublisher(Node):
             self.camera_callback,
             10
         )
+
+        # lidar subscriber
+        self.lidar_subscription = self.create_subscription(
+            LaserScan,
+            TOPIC_LIDAR,
+            self.lidar_callback,
+            10
+        )
+
+        self.obstacle_detected = False
 
         self.line_follower = LineFollower()
         self.directions_vector = [0.0, 0.0]
@@ -43,6 +99,18 @@ class VelocityPublisher(Node):
             on_release=self.on_release
             )
         self.listener.start()
+
+        self.state: AvoidState = AvoidState.LINE
+        self.front_obstacle: bool = True
+        self.front_obstacle = None
+        self.left_dist = None
+        self.right_dist = None
+        self.avoid_state = None
+
+        self.logger = logging.getLogger("velocity_publisher")
+
+        self.logger.info("VelocityPublisher node started")
+        self.logger.info(f"Logging to file: {log_file}")
 
     def on_press(self, key):
         try:
@@ -68,42 +136,93 @@ class VelocityPublisher(Node):
         self.directions_vector = self.line_follower.update(cv_image)
 
 
+    def lidar_callback(self, msg):
+        self.logger.debug(
+            f"LiDAR distances | front={self.min_front:.2f}, "
+            f"left={self.min_left:.2f}, right={self.min_right:.2f}"
+        )
+        pts = np.array([[p[0], p[1]]
+                        for p in pc2.read_points(
+                            msg, field_names=("x", "y"), skip_nans=True)])
+
+        if len(pts) == 0:
+            return
+
+        angles = np.arctan2(pts[:, 1], pts[:, 0])
+        dists = np.linalg.norm(pts, axis=1)
+
+        front = np.abs(angles) < self.front_angle
+        left = angles > self.front_angle
+        right = angles < -self.front_angle
+
+        self.min_front = np.min(dists[front]) if np.any(front) else 10.0
+        self.min_left = np.min(dists[left]) if np.any(left) else 10.0
+        self.min_right = np.min(dists[right]) if np.any(right) else 10.0
+
+
     def timer_callback(self):
-
-        visibility = self.directions_vector[0]
-        offset = self.directions_vector[1]
-
-        max_speed_forward = 1.0  # m/s
-        max_speed_sideways = 4.0 # m/s
-
-
         if self.manual:
-            msg = Twist()
+            return
 
-            # forward/back
-            if 'w' in self.keys:
-                msg.angular.z  = -max_speed_forward//2
-            elif 's' in self.keys:
-                msg.angular.z  = max_speed_forward//2
+        msg = Twist()
 
-            # left/right
-            if 'a' in self.keys:
-                msg.linear.x = -max_speed_sideways
-            elif 'd' in self.keys:
-                msg.linear.x = max_speed_sideways
+        # ==========================
+        # STATE: LINE FOLLOWING
+        # ==========================
+        if self.state == AvoidState.LINE:
+            if self.front_obstacle:
+                # decide turn direction
+                self.turn_dir = +1 if self.left_dist > self.right_dist else -1
+                self.turn_memory = 0.0
+                self.avoid_state = AvoidState.TURN_AWAY
+                return
 
+            # normal line following
+            visibility, offset = self.directions_vector[:2]
+            msg.linear.x = 4.0 * offset
+            msg.angular.z = -1.0 * visibility
             self.publisher_.publish(msg)
+            return
 
-        else:
-            msg = Twist()
-            msg.linear.x = max_speed_sideways * offset   # rotate-right (positive), rotate-left (negative)
-            msg.linear.y = 0.0 # forward (positive), backward (negative)
-            msg.linear.z = 0.0
-            msg.angular.x = 0.0
-            msg.angular.y = 0.0
-            msg.angular.z = -max_speed_forward * visibility
+        # -----------------------------
+        # TURN_AWAY – skręcaj aż przód wolny
+        # -----------------------------
+        if self.state == AvoidState.TURN_AWAY:
+            if self.min_front < self.dist_thresh:
+                msg.angular.z = self.turn_dir * self.turn_speed
+                self.turn_memory += self.turn_speed * self.dt
+                self.publisher_.publish(msg)
+                return
+            else:
+                self.state = AvoidState.PASS
+                return
 
-            self.publisher_.publish(msg)
+        # ==========================
+        # STATE: PASS ALONGSIDE
+        # ==========================
+        if self.state == AvoidState.PASS:
+            side_dist = self.min_left if self.turn_dir == 1 else self.min_right
+
+            if side_dist < self.dist_thresh:
+                msg.linear.y = 0.5
+                self.publisher_.publish(msg)
+                return
+            else:
+                self.state = AvoidState.TURN_BACK
+                return
+
+        # ==========================
+        # STATE: TURN BACK
+        # ==========================
+        if self.state == AvoidState.TURN_BACK:
+            if self.turn_memory > 0.0:
+                msg.angular.z = -self.turn_dir * self.turn_speed
+                self.turn_memory -= self.turn_speed * self.dt
+                self.publisher_.publish(msg)
+                return
+            else:
+                self.state = AvoidState.LINE
+                return
 
 
 
