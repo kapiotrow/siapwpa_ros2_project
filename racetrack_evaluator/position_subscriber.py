@@ -6,6 +6,7 @@ from geometry_msgs.msg import PoseArray, Pose
 import numpy as np
 import matplotlib.pyplot as plt
 from shapely.geometry import LineString
+from copy import deepcopy
 
 # ---------------- TRACK GENERATION ---------------------
 
@@ -41,7 +42,7 @@ def create_circle_angle(c, start, angle, R, N):
 def print_border(ax, waypoints):
     line = LineString(waypoints)
     xs, ys = line.xy
-    ax.plot(xs, ys, color="white", linewidth=2, marker='o', markersize=4, linestyle='-')
+    ax.plot(xs, ys, color="white", linewidth=2, marker='o', markersize=2, linestyle='-')
 
 # ---------------- ROS2 CONFIG --------------------------
 
@@ -67,6 +68,9 @@ def point_to_segment_distance(px, py, ax, ay, bx, by):
 
 # ---------------- SUBSCRIBER NODE ----------------------
 
+
+
+
 class PoseInfoSubscriber(Node):
 
     
@@ -81,9 +85,17 @@ class PoseInfoSubscriber(Node):
             100
         )
 
+        self.current_pos = []
+
         # trajectory
         self.traj_x = []
         self.traj_y = []
+
+        self.loss = 0
+        self.start_point = 0
+        self.next_start_point = None
+        self.ended_lap = False
+        self.near_end = False
 
         # -------------- prepare track once ------------------
 
@@ -108,15 +120,14 @@ class PoseInfoSubscriber(Node):
 
         
 
-        center_line = np.vstack([[0, 2], curve_4[::-1], curve_3[::-1], curve_2[::-1], curve_1[::-1], [0, 2]])
+        self.center_line = np.vstack([[0, 2], curve_4[::-1], curve_3[::-1], curve_2[::-1], curve_1[::-1], [0, 2]])
 
-        center_line = np.array([line*5.78 + [-7.59, -7.64] for line in center_line], dtype=np.float32)
-        print(center_line)
+        self.center_line = np.array([line*5.78 + [-7.59, -7.64] for line in self.center_line], dtype=np.float32)
 
 
-        print(len(center_line))
 
-        self.track = center_line
+        self.track = self.center_line
+        self.prev_pos = None
 
         # ------------------- PLOT SETUP ---------------------
 
@@ -132,10 +143,76 @@ class PoseInfoSubscriber(Node):
         print_border(self.ax, self.track)
 
         # trajectory line
-        self.line, = self.ax.plot([], [], 'ro-', linewidth=2)
+        self.line, = self.ax.plot([], [], 'ro-', linewidth=1, markersize=1)
 
     # ---------------- CALLBACK -----------------------------
 
+    def project_point_to_segment(self, P, A, B):
+        AP = P - A
+        AB = B - A
+
+        t = np.dot(AP, AB) / np.dot(AB, AB)
+        t_clamped = np.clip(t, 0.0, 1.0)
+
+        projection = A + t_clamped * AB
+        return projection, t_clamped
+
+
+    def estiamte_position_points(self):
+        P = np.array(self.current_pos)
+
+        min_dist = np.inf
+        best_idx = None
+        best_proj = None
+
+        
+
+        for i in range(len(self.center_line) - 1):
+            A = np.array(self.center_line[i])
+            B = np.array(self.center_line[i + 1])
+
+            proj, t = self.project_point_to_segment(P, A, B)
+
+            if 0.0 <= t <= 1.0:
+                dist = np.linalg.norm(P - proj)
+
+                if dist < min_dist:
+                    min_dist = dist
+                    best_idx = i
+                    best_proj = proj
+
+        if best_idx is None:
+            return  
+        if self.prev_pos is not None and self.prev_pos != self.current_pos:
+            self.loss += min_dist 
+
+        self.prev_pos = self.current_pos
+        
+        if self.next_start_point is None:
+            #incijalizacja lapu
+            if best_idx != 0:
+                self.near_end = False
+                self.next_start_point = best_idx
+                self.ended_lap = False
+        else:
+            self.next_start_point = best_idx
+
+        if self.next_start_point == 0:
+            self.near_end = True
+        
+        if self.next_start_point is not None:
+            if self.next_start_point == self.start_point and self.near_end and self.start_point is not None:
+                if self.ended_lap == False:
+                    # print on first pass
+                    self.get_logger().info(f"Lap ended, final loss: {self.loss}")
+                self.next_start_point = None
+                self.ended_lap = True
+                self.loss = 0
+        
+
+        self.get_logger().info(f"Loss: {self.loss}")
+       
+    
     def listener_callback(self, msg):
 
         if len(msg.poses) <= ROBOT_INDEX:
@@ -145,6 +222,8 @@ class PoseInfoSubscriber(Node):
 
         x = pose.position.x
         y = pose.position.y
+
+        self.current_pos = [x, y]
 
         self.traj_x.append(x)
         self.traj_y.append(y)
@@ -158,9 +237,13 @@ class PoseInfoSubscriber(Node):
         self.ax.relim()
         self.ax.autoscale_view()
 
+        
+        self.estiamte_position_points()
+
+        # plt.plot(self.center_line[points, 0], self.center_line[points, 1], 'go')
+
         plt.draw()
         plt.pause(0.001)
-
 
 # ---------------- MAIN EXECUTION ------------------------
 

@@ -15,6 +15,8 @@ VEL_TOPIC = '/model/samochod/cmd_vel'
 TOPIC_RGB = '/world/mecanum_drive/model/samochod/link/base_footprint/sensor/realsense_rgbd/image'
 TOPIC_DEPTH = '/world/mecanum_drive/model/samochod/link/base_footprint/sensor/realsense_depth/depth_image'
 bridge = CvBridge()
+START = False
+
 
 
 class VelocityPublisher(Node):
@@ -63,12 +65,14 @@ class VelocityPublisher(Node):
             self.keys.discard(key)
 
 
+
     def camera_callback(self, msg):
         cv_image = bridge.imgmsg_to_cv2(msg, 'bgr8')
         self.directions_vector = self.line_follower.update(cv_image)
 
 
     def timer_callback(self):
+        START = True
 
         visibility = self.directions_vector[0]
         offset = self.directions_vector[1]
