@@ -250,7 +250,7 @@
       </sensor>
 
       <sensor name="velodyne_lidar" type="gpu_ray">   <!-- albo `ray`, w zależności od wersji -->
-        <pose>0.8 0 0.4 0 0 3.14598</pose>   <!-- dostosuj wysokość / orientację -->
+        <pose>1.1 0 0.4 3.14598 0 0</pose>   <!-- dostosuj wysokość / orientację -->
         <update_rate>10</update_rate>
 
         <ray>
@@ -258,8 +258,8 @@
             <horizontal>
               <samples>1800</samples>       <!-- lub domyślna liczba np. 1875 -->
               <resolution>1</resolution>
-              <min_angle>-3.14159</min_angle>
-              <max_angle>3.14159</max_angle>
+              <min_angle>-0.785</min_angle>
+              <max_angle>0.785</max_angle>
             </horizontal>
             <vertical>
               <samples>16</samples>         <!-- np. dla VLP‑16 -->
