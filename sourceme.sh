@@ -5,4 +5,5 @@ export GZ_SIM_RESOURCE_PATH="/home/developer/ros2_ws/src/models"
 
 export ROS_DOMAIN_ID=$1
 
-# pip3 install pynput 
+# pip3 install pynput shapely
+# sudo apt install tmux 

@@ -5,7 +5,8 @@ from sensor_msgs.msg import PointCloud2
 import sensor_msgs_py.point_cloud2 as pc2
 import numpy as np
 import cv2
-
+import os
+from datetime import datetime
 
 class LidarCV2Visualizer(Node):
     def __init__(self):
@@ -25,6 +26,17 @@ class LidarCV2Visualizer(Node):
 
         self.get_logger().info("OpenCV LiDAR visualizer uruchomiony.")
 
+        log_dir = os.path.expanduser("lidar_logs")
+
+        os.makedirs(log_dir, exist_ok=True)
+
+        self.dist_log_path = os.path.join(log_dir, "lidar_distances.txt")
+
+        self.dist_log_file = open(self.dist_log_path, "a", buffering=1)
+
+        self.get_logger().info(f"LiDAR distances logged to {self.dist_log_path}")
+
+
     def callback(self, msg):
         # Pobranie punktów PointCloud2
         points_list = []
@@ -39,6 +51,14 @@ class LidarCV2Visualizer(Node):
 
         # Obliczamy dystans r = sqrt(x²+y²+z²)
         distances = np.linalg.norm(points[:, :3], axis=1)
+
+        timestamp = self.get_clock().now().nanoseconds / 1e9
+
+        # Convert to compact string
+        dist_str = " ".join(f"{d:.3f}" for d in distances)
+
+        self.dist_log_file.write(f"{timestamp:.6f} {dist_str}\n")
+
 
         # Skalowanie do 0...255
         dist_norm = (255 * (distances - distances.min()) /
@@ -58,7 +78,7 @@ class LidarCV2Visualizer(Node):
         img_color = cv2.applyColorMap(image, cv2.COLORMAP_JET)
 
         # Wyświetlanie
-        cv2.imshow("LiDAR Depth CV2", img_color)
+        cv2.imshow("LiDAR Depth CV2", cv2.normalize(img_color, None, 0, 255, cv2.NORM_MINMAX))
         cv2.waitKey(1)
 
 
