@@ -114,6 +114,13 @@ def generate_launch_description():
         output='screen'
     )
 
+    position_subscriber_node = Node(
+            package='camera_package',
+            executable='pose_info_subscriber',
+            name='pose_info_subscriber',
+            output='screen'
+    )
+
     return LaunchDescription([
 
         # Start Gazebo immediately
@@ -129,5 +136,10 @@ def generate_launch_description():
         TimerAction(
             period=3.0,
             actions=[camera_pubsub_node]
+        ),
+
+        TimerAction(
+            period=0.5,
+            actions=[position_subscriber_node]
         )
     ])

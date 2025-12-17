@@ -67,7 +67,8 @@ setup(
             # 'camera_subscriber = camera_package.camera_subscriber:main'
             # 'talker = camera_package.publisher_member_function:main',
             # 'listener = camera_package.subscriber_member_function:main'
-            'camera_pubsub = camera_package.camera_pubsub:main'
+            'camera_pubsub = camera_package.camera_pubsub:main',
+            'pose_info_subscriber = camera_package.position_subscriber:main'
         ],
     },
 )
