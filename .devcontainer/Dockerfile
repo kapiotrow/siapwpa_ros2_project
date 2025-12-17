@@ -22,7 +22,6 @@ RUN apt update && \
         python3-pynput \
         python3-shapely \
         python3-pandas \
-        python3-deepracer-utils \
         wget \
         clang-format && \
     python3 -m pip install -U \
@@ -44,7 +43,9 @@ RUN pip3 install \
     jsonschema \
     jinja2 \
     pyros-genmsg \
-    future 
+    future \
+    deepracer-utils \
+    "numpy<2"
 
 
 # Install Gazebo Harmonic - Default Gazebo version in ROS2 Humble is Fortress
