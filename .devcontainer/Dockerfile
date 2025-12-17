@@ -20,6 +20,9 @@ RUN apt update && \
         python3-vcstool \
         python3-colcon-clean \
         python3-pynput \
+        python3-shapely \
+        python3-pandas \
+        python3-deepracer-utils \
         wget \
         clang-format && \
     python3 -m pip install -U \
