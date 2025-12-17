@@ -19,6 +19,7 @@ RUN apt update && \
         python3-setuptools \
         python3-vcstool \
         python3-colcon-clean \
+        python3-pynput \
         wget \
         clang-format && \
     python3 -m pip install -U \
