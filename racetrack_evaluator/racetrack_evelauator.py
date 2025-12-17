@@ -96,6 +96,7 @@ def main():
   curve_4 = np.flipud(create_circle_angle((points[5,0],points[6,1]), points[6], -np.pi/2-0.55, R_1, N_1))
 
   center_line = np.vstack([[0,2],curve_1,curve_2,curve_3,curve_4,[0,2]], dtype=np.float32)
+  center_line = [line*6 + [-8.0, -8.0] for line in center_line]
   print(center_line)
   l_center_line = LineString(center_line)
 
@@ -103,7 +104,7 @@ def main():
   print("Is loop/ring? ", l_center_line.is_ring)
   print("Length: {:0.2f}".format(l_center_line.length))
 
-  fig = plt.figure(1, figsize=(16, 10))
+  fig = plt.figure(1, figsize=(10, 10))
   ax = fig.add_subplot(111, facecolor='black')
   plt.axis('equal')
 
