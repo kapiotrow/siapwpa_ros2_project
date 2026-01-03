@@ -9,7 +9,7 @@ package_name = 'camera_package'
 
 def package_files(directory):
     paths = []
-    for (path, directories, filenames) in os.walk(directory):
+    for (path, _, filenames) in os.walk(directory):
         for filename in filenames:
             file_path = os.path.join(path, filename)
             install_path = os.path.join(
@@ -64,11 +64,9 @@ setup(
     entry_points={
         'console_scripts': [
             'my_node = camera_package.my_node:main',
-            # 'camera_subscriber = camera_package.camera_subscriber:main'
-            # 'talker = camera_package.publisher_member_function:main',
-            # 'listener = camera_package.subscriber_member_function:main'
             'camera_pubsub = camera_package.camera_pubsub:main',
-            'pose_info_subscriber = camera_package.position_subscriber:main'
+            'pose_info_subscriber = camera_package.position_subscriber:main',
+            'lidar_subscriber = camera_package.lidar_subscriber:main'
         ],
     },
 )

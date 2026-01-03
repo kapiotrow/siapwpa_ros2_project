@@ -249,7 +249,7 @@
 
       </sensor>
 
-      <sensor name="velodyne_lidar" type="gpu_ray">   <!-- albo `ray`, w zależności od wersji -->
+      <sensor name="velodyne_lidar" type="gpu_ray">
         <pose>0.8 0 0.4 0 0 3.14598</pose>   <!-- dostosuj wysokość / orientację -->
         <update_rate>10</update_rate>
 

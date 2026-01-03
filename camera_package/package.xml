@@ -17,7 +17,6 @@
   <exec_depend>sensor_msgs</exec_depend>
   <exec_depend>cv2</exec_depend>
   <exec_depend>numpy</exec_depend>
-  <!-- <exec_depend>camera_subscriber</exec_depend> -->
   <exec_depend>Controllers</exec_depend>
   <exec_depend>FrameProcessors</exec_depend>
   <exec_depend>line_follower</exec_depend>

@@ -11,21 +11,6 @@ def generate_launch_description():
     
     pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
 
-
-    # Path to Gazebo world
-    world_path = os.path.join(
-        get_package_share_directory('camera_package'),
-        'share',
-        'camera_package',
-        'worlds',
-        'racetrack.sdf'
-    )
-
-    # gazebo = ExecuteProcess(
-    #     cmd=['gz', 'sim', world_path],
-    #     output='screen'
-    # )
-
     gz_sim = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(pkg_ros_gz_sim, 'launch', 'gz_sim.launch.py')),
@@ -106,7 +91,8 @@ def generate_launch_description():
         ),
     ]
 
-    # Publisher / Subscriber node (preferred way)
+
+
     camera_pubsub_node = Node(
         package='camera_package',
         executable='camera_pubsub',
@@ -118,6 +104,13 @@ def generate_launch_description():
             package='camera_package',
             executable='pose_info_subscriber',
             name='pose_info_subscriber',
+            output='screen'
+    )
+
+    lidar_subscriber_node = Node(
+            package='camera_package',
+            executable='lidar_subscriber',
+            name='lidar_subscriber',
             output='screen'
     )
 
@@ -141,5 +134,10 @@ def generate_launch_description():
         TimerAction(
             period=0.5,
             actions=[position_subscriber_node]
+        ),
+
+        TimerAction(
+            period=0.5,
+            actions=[lidar_subscriber_node]
         )
     ])
