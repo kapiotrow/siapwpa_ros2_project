@@ -65,8 +65,7 @@ setup(
         'console_scripts': [
             'my_node = camera_package.my_node:main',
             'camera_pubsub = camera_package.camera_pubsub:main',
-            'pose_info_subscriber = camera_package.position_subscriber:main',
-            'lidar_subscriber = camera_package.lidar_subscriber:main'
+            'pose_info_subscriber = camera_package.position_subscriber:main'
         ],
     },
 )

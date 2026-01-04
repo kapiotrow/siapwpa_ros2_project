@@ -250,8 +250,10 @@
       </sensor>
 
       <sensor name="velodyne_lidar" type="gpu_ray">
-        <pose>0.8 0 0.4 0 0 3.14598</pose>   <!-- dostosuj wysokość / orientację -->
+        <pose>1.1 0 0.4 0 0 0</pose>   <!-- dostosuj wysokość / orientację -->
         <update_rate>10</update_rate>
+
+        <gz:frame_id>velodyne_lidar</gz:frame_id>
 
         <ray>
           <scan>
@@ -269,7 +271,7 @@
             </vertical>
           </scan>
           <range>
-            <min>0.9</min>      <!-- domyślne z velodyne_simulator -->
+            <min>0.1</min>      <!-- domyślne z velodyne_simulator -->
             <max>130.0</max>
             <resolution>0.01</resolution>
           </range>

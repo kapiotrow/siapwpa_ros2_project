@@ -45,7 +45,7 @@ RUN pip3 install \
     pyros-genmsg \
     future \
     deepracer-utils \
-    "numpy<2"
+    "numpy==1.24.0"
 
 
 # Install Gazebo Harmonic - Default Gazebo version in ROS2 Humble is Fortress

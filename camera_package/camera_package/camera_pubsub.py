@@ -5,10 +5,13 @@ from .line_follower import LineFollower
 from sensor_msgs.msg import Image
 from geometry_msgs.msg import Twist
 from pynput import keyboard as kb
+from sensor_msgs.msg import LaserScan
+from . obstacle_avoidance import ObstacleAvoidance
 
 VEL_TOPIC = '/model/samochod/cmd_vel'
 TOPIC_RGB = '/world/mecanum_drive/model/samochod/link/base_footprint/sensor/realsense_rgbd/image'
 TOPIC_DEPTH = '/world/mecanum_drive/model/samochod/link/base_footprint/sensor/realsense_depth/depth_image'
+TOPIC_LIDAR = '/world/mecanum_drive/model/samochod/link/base_footprint/sensor/velodyne_lidar/scan'
 bridge = CvBridge()
 
 
@@ -20,15 +23,29 @@ class VelocityPublisher(Node):
         self.publisher_ = self.create_publisher(Twist, VEL_TOPIC, 10)
         self.timer = self.create_timer(0.5, self.timer_callback)
 
-        self.subscription = self.create_subscription(
+        self.camera_subscriber = self.create_subscription(
             Image,
             TOPIC_RGB,
             self.camera_callback,
             10
         )
 
+        self.lidar_subscriber = self.create_subscription(
+            LaserScan,
+            TOPIC_LIDAR,
+            self.lidar_callback,
+            10
+        )
+
+        self.max_speed_forward = 1.0  # m/s
+        self.max_speed_sideways = 4.0 # m/s
+
+        self.obstacle_avoider = ObstacleAvoidance()
+        self.obstacle_directions_vector = [0.0, 0.0, 0.0]
+        self.isAvoiding = self.obstacle_directions_vector[2]
+
         self.line_follower = LineFollower()
-        self.directions_vector = [0.0, 0.0]
+        self.directions_vector = [0.0, 0.0, 0.0]
         self.manual = False
         self.keys = set()
 
@@ -62,40 +79,56 @@ class VelocityPublisher(Node):
         self.directions_vector = self.line_follower.update(cv_image)
 
 
+    def lidar_callback(self, msg):
+        self.obstacle_directions_vector = self.obstacle_avoider.update(msg)
+
+
     def timer_callback(self):
-
-        visibility = self.directions_vector[0]
-        offset = self.directions_vector[1]
-
-        max_speed_forward = 1.0  # m/s
-        max_speed_sideways = 4.0 # m/s
-
+        self.isAvoiding = self.obstacle_directions_vector[2]
 
         if self.manual:
             msg = Twist()
 
             # forward/back
             if 'w' in self.keys:
-                msg.angular.z  = -max_speed_forward//2
+                msg.angular.z  = -self.max_speed_forward//2
             elif 's' in self.keys:
-                msg.angular.z  = max_speed_forward//2
+                msg.angular.z  = self.max_speed_forward//2
 
             # left/right
             if 'a' in self.keys:
-                msg.linear.x = -max_speed_sideways
+                msg.linear.x = -self.max_speed_sideways
             elif 'd' in self.keys:
-                msg.linear.x = max_speed_sideways
+                msg.linear.x = self.max_speed_sideways
+
+            self.publisher_.publish(msg)
+
+        elif self.isAvoiding:
+            self.get_logger().info(f"AVOIDING")
+            visibility = self.obstacle_directions_vector[0]
+            offset = self.obstacle_directions_vector[1]
+
+            msg = Twist()
+            msg.linear.x = self.max_speed_sideways * offset
+            msg.linear.y = 0.0
+            msg.linear.z = 0.0
+            msg.angular.x = 0.0
+            msg.angular.y = 0.0
+            msg.angular.z = -self.max_speed_forward * visibility
 
             self.publisher_.publish(msg)
 
         else:
+            visibility = self.directions_vector[0]
+            offset = self.directions_vector[1]
+
             msg = Twist()
-            msg.linear.x = max_speed_sideways * offset   # rotate-right (positive), rotate-left (negative)
-            msg.linear.y = 0.0 # forward (positive), backward (negative)
+            msg.linear.x = self.max_speed_sideways * offset
+            msg.linear.y = 0.0
             msg.linear.z = 0.0
             msg.angular.x = 0.0
             msg.angular.y = 0.0
-            msg.angular.z = -max_speed_forward * visibility
+            msg.angular.z = -self.max_speed_forward * visibility
 
             self.publisher_.publish(msg)
 

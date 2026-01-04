@@ -1,5 +1,5 @@
 import os
-
+import xacro
 from launch import LaunchDescription
 from launch.actions import ExecuteProcess, TimerAction, IncludeLaunchDescription
 from launch_ros.actions import Node
@@ -10,6 +10,11 @@ from ament_index_python.packages import get_package_share_directory
 def generate_launch_description():
     
     pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
+    # camera_package_dir = get_package_share_directory('camera_package')
+
+    # xacro_file = os.path.join(camera_package_dir, 'models/nexus_4wd_mecanum/urdf', 'nexus_4wd_mecanum.urdf.xacro')
+    # robot_description_config = xacro.process_file(xacro_file)
+    # robot_description = {'robot_description': robot_description_config.toxml()}
 
     gz_sim = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -107,12 +112,13 @@ def generate_launch_description():
             output='screen'
     )
 
-    lidar_subscriber_node = Node(
-            package='camera_package',
-            executable='lidar_subscriber',
-            name='lidar_subscriber',
-            output='screen'
-    )
+    # robot_state_publisher_node = Node(
+    #     package='robot_state_publisher',
+    #     executable='robot_state_publisher',
+    #     output='screen',
+    #     parameters=[robot_description]
+    # )
+
 
     return LaunchDescription([
 
@@ -134,10 +140,10 @@ def generate_launch_description():
         TimerAction(
             period=0.5,
             actions=[position_subscriber_node]
-        ),
-
-        TimerAction(
-            period=0.5,
-            actions=[lidar_subscriber_node]
         )
+
+        # TimerAction(
+        #     period=0.5,
+        #     actions=[robot_state_publisher_node]
+        # )
     ])
