@@ -3,6 +3,8 @@ import cv2
 import numpy as np
 import math
 
+import pygame
+
 class FrameProcessor(ABC):
     @abstractmethod
     def process(self, frame):
@@ -63,11 +65,23 @@ class BaseLineProcessor(FrameProcessor):
             if frame is None or frame.size == 0:
                 print("Warning: Empty frame")
                 return self.last_vector
-
+            
             hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-            mask = cv2.inRange(hsv,
-                               np.array([15, 80, 80]),
-                               np.array([45, 255, 255]))
+
+            lower_red1 = np.array([0, 80, 80])
+            upper_red1 = np.array([10, 255, 255])
+
+            # górny zakres czerwieni
+            lower_red2 = np.array([170, 80, 80])
+            upper_red2 = np.array([179, 255, 255])
+
+            mask1 = cv2.inRange(hsv, lower_red1, upper_red1)
+            mask2 = cv2.inRange(hsv, lower_red2, upper_red2)
+
+            mask = cv2.bitwise_or(mask1, mask2)
+            # mask = cv2.inRange(hsv,
+            #                    np.array([15, 80, 80]),
+            #                    np.array([45, 255, 255]))
 
             contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL,
                                            cv2.CHAIN_APPROX_NONE)
@@ -108,8 +122,10 @@ class BaseLineProcessor(FrameProcessor):
 
         # cv2.imshow("Frame", frame)
         # cv2.waitKey(1)
+        
 
-        return output
+
+        return frame
 
 class LineKalmanProcessor(FrameProcessor):
     def __init__(self, alpha=0.7, max_missing=5, dt=0.05):
@@ -151,8 +167,18 @@ class LineKalmanProcessor(FrameProcessor):
         h, w, _ = frame.shape
         cx = w // 2
 
-        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        mask = cv2.inRange(hsv, np.array([15, 80, 80]), np.array([45, 255, 255]))
+        hsv = cv2.cvtColor(frame, cv2.COLOR_RGB2HSV)
+        lower_red1 = np.array([0, 150, 100])    # H od 0 do 5, S ≥ 150, V ≥ 100
+        upper_red1 = np.array([5, 255, 255])
+
+        lower_red2 = np.array([175, 150, 100])  # H od 175 do 179, S ≥ 150, V ≥ 100
+        upper_red2 = np.array([179, 255, 255])
+
+
+        mask1 = cv2.inRange(hsv, lower_red1, upper_red1)
+        mask2 = cv2.inRange(hsv, lower_red2, upper_red2)
+
+        mask = cv2.bitwise_or(mask1, mask2)
         contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
         centroids = []
 
@@ -209,7 +235,7 @@ class LineKalmanProcessor(FrameProcessor):
 
             # Draw line connecting closest neighbors
             connected = set()
-            for i, pt in enumerate(tracked_pts):
+            for i, pt in enumerate(tracked_pts[:5]):
                 min_dist = float("inf")
                 closest_j = None
                 for j, other in enumerate(tracked_pts):
@@ -224,10 +250,10 @@ class LineKalmanProcessor(FrameProcessor):
                     connected.add((i, closest_j))
 
 
-        self.visualize_tracks(frame, tracked_pts, output)
-        cv2.imshow("KalmanFrame", frame)
-        cv2.waitKey(1)
-        return output
+        # self.visualize_tracks(frame, tracked_pts, output)
+        # cv2.imshow("KalmanFrame", frame)
+        # cv2.waitKey(1)
+        return frame
 
     def visualize_tracks(self, frame, pts, control_vector=None):
         for pt in pts:
