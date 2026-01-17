@@ -1,4 +1,4 @@
-FROM osrf/ros:humble-desktop
+FROM arm64v8/ros:humble
 
 SHELL ["/bin/bash", "-c"]
 
@@ -19,10 +19,10 @@ RUN apt update && \
         python3-setuptools \
         python3-vcstool \
         python3-colcon-clean \
-        python3-pynput \
-        python3-shapely \
-        python3-pandas \
         wget \
+        joystick \
+        libsdl2-dev \
+        # libpcl-all \
         clang-format && \
     python3 -m pip install -U \
         argcomplete \
@@ -44,19 +44,20 @@ RUN pip3 install \
     jinja2 \
     pyros-genmsg \
     future \
-    deepracer-utils \
-    "numpy==1.24.0"
+    pygame \
+    pyserial
 
 
 # Install Gazebo Harmonic - Default Gazebo version in ROS2 Humble is Fortress
 RUN curl https://packages.osrfoundation.org/gazebo.gpg --output /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg
 RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null
 RUN apt-get update -y
-RUN apt-get install -y ros-humble-ros-gzharmonic
+# RUN apt-get install -y ros-humble-ros-gzharmonic
 RUN apt install -y ros-humble-turtle-tf2-py ros-humble-tf2-tools
 
 RUN apt-get update -y
 RUN apt-get upgrade -y
+RUN apt-get install -y nano vim
 
 RUN useradd -rm -d /home/developer -s /bin/bash -g root -G sudo -u 1001 developer && \
     echo 'developer:developer' | chpasswd && \
@@ -69,8 +70,8 @@ USER developer
 COPY . /home/developer/ros2_ws
 WORKDIR /home/developer/ros2_ws
 
-
 RUN echo ". /opt/ros/$ROS_DISTRO/setup.bash" >> ~/.bashrc \
-    && echo ". /home/developer/ros2_ws/install/setup.bash" >> ~/.bashrc
+    && echo ". /home/developer/ros2_ws/install/setup.bash" >> ~/.bashrc \
+    && echo "export GZ_SIM_RESOURCE_PATH=$GZ_SIM_RESOURCE_PATH:~/ros2_ws/src/simple_example/resource/" >> ~/.bashrc
 
 CMD [ "sleep", "infinity" ]
