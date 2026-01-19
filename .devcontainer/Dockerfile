@@ -49,7 +49,8 @@ RUN pip3 install \
     pyserial \
     protobuf \
     matplotlib \
-    "numpy==1.23.1"
+    "numpy==1.23.1" \
+    scipy
 
 
 # Install Gazebo Harmonic - Default Gazebo version in ROS2 Humble is Fortress

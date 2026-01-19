@@ -63,11 +63,20 @@ class BaseLineProcessor(FrameProcessor):
             if frame is None or frame.size == 0:
                 print("Warning: Empty frame")
                 return self.last_vector
+            
+            # frame = cv2.cvtColor(frame, cv2.COLOr_BGR2RGB)
 
-            hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-            mask = cv2.inRange(hsv,
-                               np.array([15, 80, 80]),
-                               np.array([45, 255, 255]))
+            hsv = cv2.cvtColor(frame, cv2.COLOR_2HSV)
+
+            # Red color ranges (lower and upper in HSV)
+            lower_red1 = np.array([0, 100, 100])
+            upper_red1 = np.array([10, 255, 255])
+            lower_red2 = np.array([170, 100, 100])
+            upper_red2 = np.array([180, 255, 255])
+            mask1 = cv2.inRange(hsv, lower_red1, upper_red1)
+            mask2 = cv2.inRange(hsv, lower_red2, upper_red2)
+
+            mask = cv2.bitwise_or(mask1, mask2)
 
             contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL,
                                            cv2.CHAIN_APPROX_NONE)
@@ -152,7 +161,24 @@ class LineKalmanProcessor(FrameProcessor):
         cx = w // 2
 
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        mask = cv2.inRange(hsv, np.array([15, 80, 80]), np.array([45, 255, 255]))
+
+        # lower red range
+        mask_red1 = cv2.inRange(
+            hsv,
+            np.array([0, 80, 80]),
+            np.array([10, 255, 255])
+        )
+
+        # upper red range
+        mask_red2 = cv2.inRange(
+            hsv,
+            np.array([170, 80, 80]),
+            np.array([180, 255, 255])
+        )
+
+        # combine both masks
+        mask = cv2.bitwise_or(mask_red1, mask_red2)
+        # mask = cv2.inRange(hsv, np.array([15, 80, 80]), np.array([45, 255, 255]))
         contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
         centroids = []
 
