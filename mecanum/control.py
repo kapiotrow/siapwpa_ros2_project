@@ -8,10 +8,10 @@ from camera_libs_symlink.FrameProcessors import LineKalmanProcessor
 import matplotlib.pyplot as plt
 
 # ====== KONFIGURACJA ======
-ROBOT_PORT = "/dev/ttyUSB0"
+ROBOT_PORT = "/dev/ttyUSB1"
 BAUDRATE = 19200
 
-CAMERA_INDEX = 4         # /dev/video0  # 2--IR ; 4--RGB
+CAMERA_INDEX = 20
 FRAME_WIDTH = 640
 FRAME_HEIGHT = 480
 FPS = 20.0

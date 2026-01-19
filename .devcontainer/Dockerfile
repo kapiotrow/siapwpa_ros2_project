@@ -46,7 +46,10 @@ RUN pip3 install \
     pyros-genmsg \
     future \
     pygame \
-    pyserial
+    pyserial \
+    protobuf \
+    matplotlib \
+    "numpy==1.23.1"
 
 
 # Install Gazebo Harmonic - Default Gazebo version in ROS2 Humble is Fortress
@@ -63,6 +66,10 @@ RUN apt-get install -y nano vim
 RUN useradd -rm -d /home/developer -s /bin/bash -g root -G sudo -u 1001 developer && \
     echo 'developer:developer' | chpasswd && \
     adduser developer sudo
+RUN groupadd -g 20 plugdev || true
+RUN groupadd -g 20 video || true
+RUN usermod -aG plugdev developer
+RUN usermod -aG video developer
 USER developer
 
 # RUN git clone https://github.com/PX4/PX4-Autopilot.git ~/PX4-Autopilot --recursive -b main && \

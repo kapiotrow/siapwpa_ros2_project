@@ -14,6 +14,9 @@ screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 pygame.display.set_caption("Gamepad Visualization")
 clock = pygame.time.Clock()
 
+os.environ["SDL_AUDIODRIVER"] = "dummy"
+os.environ["SDL_VIDEODRIVER"] = "dummy"
+
 # Kolory
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)

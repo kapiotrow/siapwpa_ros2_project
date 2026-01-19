@@ -16,11 +16,19 @@ services:
       - /dev:/dev
       - /dev/input/js*:/dev/input/js*
       - /dev/input/event*:/dev/input/event*
-      - /dev/tty*:/dev/tty*
       - "/dev/bus/usb:/dev/bus/usb"   # RealSense
+      - /dev/ttyUSB0:/dev/ttyUSB0
+      - /dev/ttyUSB1:/dev/ttyUSB1
+      - /dev/ttyUSB2:/dev/ttyUSB2
+      - /dev/ttyUSB3:/dev/ttyUSB3
+      - /dev/ttyUSB4:/dev/ttyUSB4
+      - /dev/video*:/dev/video*
     group_add:
-      - 107
+      - plugdev
+      - video
     user: developer
+    ports:
+      - "5000:5000"
     environment:
       - DISPLAY
       - "QT_X11_NO_MITSHM=1"
