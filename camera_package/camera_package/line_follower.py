@@ -9,6 +9,8 @@ class LineFollower:
         self.processor = LineKalmanProcessor()
         self.controller = PIDController()
         self.controller.attach_processor(self.processor)
+        print(f"Processor: {type(self.processor)}")
+        print(f"Controller: {type(self.controller)}")
 
     def update(self, frame):
         """

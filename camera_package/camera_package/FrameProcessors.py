@@ -180,7 +180,14 @@ class LineKalmanProcessor(FrameProcessor):
         mask = cv2.bitwise_or(mask_red1, mask_red2)
         # mask = cv2.inRange(hsv, np.array([15, 80, 80]), np.array([45, 255, 255]))
         contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+        # sort contours by area (descending)
+        contours = sorted(contours, key=cv2.contourArea, reverse=True)
+
+        # keep only the biggest 20
+        contours = contours[:20]
         centroids = []
+
+        print(f"Found Contours, len: {len(contours)}", end="\t")
 
         for c in contours:
             M = cv2.moments(c)
@@ -250,9 +257,9 @@ class LineKalmanProcessor(FrameProcessor):
                     connected.add((i, closest_j))
 
 
-        self.visualize_tracks(frame, tracked_pts, output)
-        cv2.imshow("KalmanFrame", frame)
-        cv2.waitKey(1)
+        # self.visualize_tracks(frame, tracked_pts, output)
+        # cv2.imshow("KalmanFrame", frame)
+        # cv2.waitKey(1)
         return output
 
     def visualize_tracks(self, frame, pts, control_vector=None):

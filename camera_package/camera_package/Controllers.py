@@ -41,8 +41,9 @@ class PIDController:
         if self.processor is None:
             raise RuntimeError("PIDController has no FrameProcessor attached")
 
+        # print(f"Processing Frame, Shape: {frame.shape}")
         visibility, offset, _ = self.processor.process(frame)
-
+        # print(f"Processed Frame")
         self.last_visibility = visibility
         self.last_offset = offset
 
@@ -63,6 +64,7 @@ class PIDController:
         yaw = self.P * error + self.I * I_term + self.D * D_term
 
         # Control vector: visibility, yaw, forward_speed
+        # print(f"Controll values: {visibility, yaw, 0.0}")
         return [visibility, yaw, 0.0]
 
 class LQRController(Controller):

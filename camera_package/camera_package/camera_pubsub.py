@@ -7,6 +7,9 @@ from geometry_msgs.msg import Twist
 from pynput import keyboard as kb
 from sensor_msgs.msg import LaserScan
 from . obstacle_avoidance import ObstacleAvoidance
+import mecanum_pb2
+import serial
+import time
 
 VEL_TOPIC = '/model/samochod/cmd_vel'
 TOPIC_RGB = '/world/mecanum_drive/model/samochod/link/base_footprint/sensor/realsense_rgbd/image'
@@ -19,6 +22,16 @@ class VelocityPublisher(Node):
 
     def __init__(self):
         super().__init__('velocity_publisher')
+
+        try:
+            self.ser = serial.Serial('/dev/ttyUSB1', 19200, timeout=1)  # Dostosuj port według potrzeb
+            time.sleep(2)
+            print("Połączono z robotem przez port /dev/ttyUSB1")
+            self.robot_connected = True
+        except serial.SerialException:
+            print("Nie można połączyć z robotem - sprawdź połączenie USB")
+            self.robot_connected = False
+            self.ser = None
 
         self.publisher_ = self.create_publisher(Twist, VEL_TOPIC, 10)
         self.timer = self.create_timer(0.5, self.timer_callback)
@@ -84,7 +97,7 @@ class VelocityPublisher(Node):
 
 
     def timer_callback(self):
-        self.isAvoiding = self.obstacle_directions_vector[2]
+        self.isAvoiding = False
 
         if self.manual:
             msg = Twist()
@@ -102,6 +115,17 @@ class VelocityPublisher(Node):
                 msg.linear.x = self.max_speed_sideways
 
             self.publisher_.publish(msg)
+
+            request = mecanum_pb2.ControlRequest()
+            request.speed_mmps = int(msg.angular.z)
+            request.rad = float(msg.linear.z)
+            request.omega = float(0)
+        
+            # Serializacja wiadomości
+            serialized_data = request.SerializeToString()
+            
+            # Wysłanie do Arduino
+            self.ser.write(serialized_data)
 
         elif self.isAvoiding:
             self.get_logger().info(f"AVOIDING")
@@ -131,6 +155,17 @@ class VelocityPublisher(Node):
             msg.angular.z = -self.max_speed_forward * visibility
 
             self.publisher_.publish(msg)
+
+            request = mecanum_pb2.ControlRequest()
+            request.speed_mmps = int(msg.angular.z)
+            request.rad = float(msg.linear.z)
+            request.omega = float(0)
+        
+            # Serializacja wiadomości
+            serialized_data = request.SerializeToString()
+            
+            # Wysłanie do Arduino
+            self.ser.write(serialized_data)
 
 
 

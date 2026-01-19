@@ -32,7 +32,7 @@ SPEED_MMPS = 50           # mała prędkość
 DIRECTION_RAD = 3 * math.pi / 2  # TYŁ
 OMEGA_RAD = 0.0           # brak obrotu
 
-INTERVAL = 0.001            # 100 ms
+INTERVAL = 0.01            # 100 ms
 VIDEO_FILENAME = "test_backwards.mp4"
 # ==========================
 
@@ -63,28 +63,28 @@ def main():
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, FRAME_WIDTH)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, FRAME_HEIGHT)
 
-    fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    out = cv2.VideoWriter(
-        VIDEO_FILENAME,
-        fourcc,
-        FPS,
-        (FRAME_WIDTH, FRAME_HEIGHT)
-    )
+    # fourcc = cv2.VideoWriter_fourcc(*'XVID')
+    # out = cv2.VideoWriter(
+    #     VIDEO_FILENAME,
+    #     fourcc,
+    #     FPS,
+    #     (FRAME_WIDTH, FRAME_HEIGHT)
+    # )
 
-    if not out.isOpened():
-        print("Nie można otworzyć pliku wideo")
-        cap.release()
-        ser.close()
-        return
+    # if not out.isOpened():
+    #     print("Nie można otworzyć pliku wideo")
+    #     cap.release()
+    #     ser.close()
+    #     return
 
+    time.sleep(INTERVAL)
     print("Kamera uruchomiona")
-    print("jazdaaaaa")
 
     last_command_time = 0
 
     try:
         while True:
-            current_time = time.time()
+            # print("Loop Entered")
 
             # --- Odczyt klatki ---
             ret, frame = cap.read()
@@ -92,32 +92,32 @@ def main():
                 print("Błąd odczytu klatki z kamery")
                 break
 
+            # print(f"Cep read return: {ret}", flush=True)
+
+            time_start = time.time()
             speed, direction, _ = line_follower.update(frame)
+            time_stop = time.time()
+            print(f"Speed: {speed}, direction: {direction}, elapsed time ms: {1000*(time_stop-time_start)}", flush=True)
 
             # --- Sterowanie robotem ---
             # if current_time - last_command_time >= INTERVAL:
             send_robot_command(
                 ser,
-                500*speed,
-                (-3.14/2 * (direction)) + 3.14/2,
-                0
+                150*speed,
+                3.14/2,
+                0.5*direction
+                # 0
             )
-            last_command_time = current_time
 
             time.sleep(INTERVAL)
 
     except KeyboardInterrupt:
-        print("\nCTRL+C - zatrzymywanie robota")
-
-    finally:
-        # STOP robota
-        send_robot_command(ser, 0, 0, 0)
-
-        out.release()
+        print("\nCTRL+C - zatrzymywanie robota")        
         cap.release()
         ser.close()
 
         print("Połączenia zamknięte")
+
 
 if __name__ == "__main__":
     main()
