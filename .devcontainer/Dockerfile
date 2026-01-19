@@ -16,6 +16,7 @@ RUN apt update && \
         python3-pip \
         python3-pytest-cov \
         python3-rosdep \
+        ros-humble-realsense2-camera \
         python3-setuptools \
         python3-vcstool \
         python3-colcon-clean \
