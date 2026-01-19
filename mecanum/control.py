@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 ROBOT_PORT = "/dev/ttyUSB1"
 BAUDRATE = 19200
 
-CAMERA_INDEX = 20
+CAMERA_INDEX = 4
 FRAME_WIDTH = 640
 FRAME_HEIGHT = 480
 FPS = 20.0
@@ -41,14 +41,14 @@ def send_robot_command(ser, speed_mmps, direction_rad, omega_rads):
     ser.write(request.SerializeToString())
 
 def main():
-    # ===== ROBOT =====
-    try:
-        ser = serial.Serial(ROBOT_PORT, BAUDRATE, timeout=1)
-        time.sleep(2)
-        print("Połączono z robotem")
-    except serial.SerialException as e:
-        print("Błąd portu szeregowego:", e)
-        return
+    # # ===== ROBOT =====
+    # try:
+    #     ser = serial.Serial(ROBOT_PORT, BAUDRATE, timeout=1)
+    #     time.sleep(2)
+    #     print("Połączono z robotem")
+    # except serial.SerialException as e:
+    #     print("Błąd portu szeregowego:", e)
+    #     return
 
     # ===== KAMERA =====
     cap = cv2.VideoCapture(CAMERA_INDEX)
@@ -84,15 +84,15 @@ def main():
         while True:
             current_time = time.time()
 
-            # --- Sterowanie robotem ---
-            if current_time - last_command_time >= INTERVAL:
-                send_robot_command(
-                    ser,
-                    SPEED_MMPS,
-                    DIRECTION_RAD,
-                    OMEGA_RAD
-                )
-                last_command_time = current_time
+            # # --- Sterowanie robotem ---
+            # if current_time - last_command_time >= INTERVAL:
+            #     send_robot_command(
+            #         ser,
+            #         SPEED_MMPS,
+            #         DIRECTION_RAD,
+            #         OMEGA_RAD
+            #     )
+            #     last_command_time = current_time
 
             # --- Odczyt klatki ---
             ret, frame = cap.read()
@@ -119,11 +119,11 @@ def main():
 
     finally:
         # STOP robota
-        send_robot_command(ser, 0, 0, 0)
+        # send_robot_command(ser, 0, 0, 0)
 
         out.release()
         cap.release()
-        ser.close()
+        # ser.close()
 
         print("Zapis wideo zakończony")
         print("Połączenia zamknięte")
