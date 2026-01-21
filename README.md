@@ -1,56 +1,38 @@
-# ROS 2 + Gazebo Harmonic docker
+# Hanka Mecanum Line-Following Robot
 
-Repozytorium zawiera kod do wykorzystania przez studentów w celu realizacji zajęć z Systemów i Algorytmów Percepcji w Pojazdach Autonomicznych (SiAPwPA) w semestrze zimowym 2024/2025.
+## Requirements
+### For Gazebo/ROS2 simulation
+* Ubuntu OS (tested only on 22.04 LTS)
+* Nvidia RTX graphics
 
-## Wymagania
+### For hardware
+* Hanka :)
+* RPi 5 with Debian Bookworm
+* Intel Realsense 2 camera
 
-- [Docker](https://docs.docker.com/engine/install/ubuntu/)
-- [Nvidia Docker](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#container-device-interface-cdi-support)
-- [VS Code devcontainer plugin](https://code.visualstudio.com/docs/devcontainers/containers#_quick-start-open-an-existing-folder-in-a-container)
+## Usage
+**Use main branch for simulation and raspberry-pi for hardware!**
+### Simulation
+After cloning the repo and making sure you're on `main` branch, **reopen the foder in container** (e.g. with VS Code's Remote Explorer extension). Open a new terminal and build the ROS package.
+```
+colcon build
+```
 
-> [!IMPORTANT]  
-> System operacyjnym Ubuntu jest wymagany ze względu na obsługę GUI (wymaga innego podejścia przy wykorzystaniu Windowsa).
+Then source `sourceme.sh` with a parameter (ROS ID, choose one that noone else is using in your network).
+```
+. ./sourceme.sh 121
+```
+Finally, launch the simulation.
+```
+ros2 launch camera_package bridge.launch.py
+```
+After a couple of second you should see a new window appear with Gazebo. Play the simulation using the "play" button in the left bottom corner.
 
-## Start
-
-Otwórz VS Code w katalogu z projektem.
-Przejdź do lewego dolnego rogu i kliknij niebieską ikonę z dwiema strzałkami skierowanymi do siebie. Z rozwijanego menu wybierz **"Open Folder in Container... ”** i poczekaj, aż docker się zbuduje. Może to potrwać do 10 minut przy wolniejszym połączeniu internetowym.
-
-> [!TIP]
-> Dla osób korzystających z Windowsa oraz WSL 2 przygotowano `Dockerfile.windows` oraz `compose.windows.yaml`. 
-
-Po zalogowaniu się do dockera będzie on działał w sposób podobny do uruchamiania ROS na komputerze hosta. Wszystkie aplikacje GUI będą korzystać z domyślnego menedżera okien hosta, będziesz mieć również dostęp do wszystkich urządzeń na hoście, a także akceleracji GPU.
-Docker ma preinstalowany [ROS 2 Humble](https://docs.ros.org/en/humble/Tutorials.html) i większość potrzebnych zależności oraz symulator [Gazebo Harmonic](https://gazebosim.org/docs/harmonic/getstarted/).
-
-## Pierwsze uruchomienie
-
-Dla osób, które nie miały doczynienia ze środowiskiem ROS 2 + Gazebo, zachęcam do przerobienia tutorialu: [Gazebo Tutorial](https://gazebosim.org/docs/harmonic/tutorials/). Pozwoli to zaznajomić się z tym środowiskiem i tworzyć w przyszłości zaawansowane symulacje.
-
-Następnie pomocne będzie odpowiednia kontrola robotami w środowisku symulacyjnym, na dobry start proszę zaznajomić się z repozytorium: [Gazebo ROS 2 Control](https://github.com/ros-controls/gz_ros2_control/).
-
-Na sam koniec pewnym podsumowaniem, a także praktycznym podejściem do tematu jest dostarczony od [Husariona](https://husarion.com/tutorials/ros2-tutorials/1-ros2-introduction/) tutorial dla ich kilku robotów.
-
-> [!IMPORTANT] 
-Należy pamiętać, aby po zbudowaniu wywołać komendę lub pracować w nowym terminalu:
->
-> ```bash
-> source ~/.bashrc
-> ```
->
-> W tym pliku dodane są już dwie ważne ścieżki:
->
-> ```bash
-> /opt/ros/$ROS_DISTRO/setup.bash
-> /home/developer/ros2_ws/install/setup.bash
-> ```
-
-## Przykład
-1. Zbuduj obszar roboczy wraz z simple_example package.  
-2. Uruchom launcha `example.launch.py`, pokazujący, w jaki sposób należy połączyć Gazebo z ROS 2, aby możliwa była wzajemna komunikacja.
-
-
-## Dodatkowe materiały
-* [Getting Started](docs/getting_started.md)
-* [ROS 2 Command Cheat Sheet](docs/cheatsheet.md)
-* [ROS 2 Example packages in Python](docs/example.md)
-* [Bridge communication between ROS and Gazebo](docs/ros_gz_bridge.md)
+### Hardware
+Connect Hanka's USB and Realsense's USB into the RPi. Power up the board. On your PC connect to the RPi using SSH. Clone the repository and `git checkout raspberry-pi` into the correct branch. Navigate to the project's folder and reopen it in container.
+Power up Hanka, make sure the camera can see the line (it should be **red**!).
+Open a new terminal and run the control script.
+```
+python3 mecanum/control.py
+```
+The script can take a couple of seconds to start.
