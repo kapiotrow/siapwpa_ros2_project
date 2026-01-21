@@ -113,10 +113,10 @@ class BaseLineProcessor(FrameProcessor):
 
         # visualization
         visibility, offset, _ = output
-        # self.visualize_input(frame, offset, output)
+        self.visualize_input(frame, offset, output)
 
-        # cv2.imshow("Frame", frame)
-        # cv2.waitKey(1)
+        cv2.imshow("Frame", frame)
+        cv2.waitKey(1)
 
         return output
 
@@ -162,18 +162,20 @@ class LineKalmanProcessor(FrameProcessor):
 
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
+        # print(f"hsv: {hsv[200, 200]}")
+
         # lower red range
         mask_red1 = cv2.inRange(
             hsv,
-            np.array([0, 80, 80]),
-            np.array([10, 255, 255])
+            np.array([0, 100, 100]),
+            np.array([20, 255, 255])
         )
 
         # upper red range
         mask_red2 = cv2.inRange(
             hsv,
-            np.array([170, 80, 80]),
-            np.array([180, 255, 255])
+            np.array([160, 100, 100]),
+            np.array([179, 255, 255])
         )
 
         # combine both masks
@@ -187,7 +189,7 @@ class LineKalmanProcessor(FrameProcessor):
         contours = contours[:20]
         centroids = []
 
-        print(f"Found Contours, len: {len(contours)}", end="\t")
+        # print(f"Found Contours, len: {len(contours)}", end="\t")
 
         for c in contours:
             M = cv2.moments(c)
@@ -257,9 +259,9 @@ class LineKalmanProcessor(FrameProcessor):
                     connected.add((i, closest_j))
 
 
-        # self.visualize_tracks(frame, tracked_pts, output)
-        # cv2.imshow("KalmanFrame", frame)
-        # cv2.waitKey(1)
+        self.visualize_tracks(frame, tracked_pts, output)
+        cv2.imshow("KalmanFrame", frame)
+        cv2.waitKey(1)
         return output
 
     def visualize_tracks(self, frame, pts, control_vector=None):

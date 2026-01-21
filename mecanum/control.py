@@ -80,8 +80,6 @@ def main():
     time.sleep(INTERVAL)
     print("Kamera uruchomiona")
 
-    last_command_time = 0
-
     try:
         while True:
             # print("Loop Entered")
@@ -94,22 +92,19 @@ def main():
 
             # print(f"Cep read return: {ret}", flush=True)
 
-            time_start = time.time()
             speed, direction, _ = line_follower.update(frame)
-            time_stop = time.time()
-            print(f"Speed: {speed}, direction: {direction}, elapsed time ms: {1000*(time_stop-time_start)}", flush=True)
+            # print(f"Speed: {speed}, direction: {direction}", flush=True)
 
             # --- Sterowanie robotem ---
             # if current_time - last_command_time >= INTERVAL:
             send_robot_command(
                 ser,
-                150*speed,
+                50*speed,
                 3.14/2,
-                0.5*direction
-                # 0
+                -0.4*direction
             )
 
-            time.sleep(INTERVAL)
+            # time.sleep(INTERVAL)
 
     except KeyboardInterrupt:
         print("\nCTRL+C - zatrzymywanie robota")        
